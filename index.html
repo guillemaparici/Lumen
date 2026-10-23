@@ -182,13 +182,14 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .ibtn:not(:disabled):active,.pill:not(:disabled):active,.btn:not(:disabled):active,.chip:active{transform:scale(.97);transition-duration:.08s}
 
 /* Pestañas: control segmentado con indicador de luz que se desliza */
-#tools{display:grid;grid-template-columns:repeat(3,1fr);margin:8px 8px 0;padding:4px;border-radius:999px;background:rgba(255,255,255,.035)}
-.tab-ind{position:absolute;top:4px;bottom:4px;left:4px;width:calc((100% - 8px) / 3);border-radius:999px;
+#tools{display:grid;grid-template-columns:repeat(4,1fr);margin:8px 8px 0;padding:4px;border-radius:999px;background:rgba(255,255,255,.035)}
+.tab-ind{position:absolute;top:4px;bottom:4px;left:4px;width:calc((100% - 8px) / 4);border-radius:999px;
   background:linear-gradient(180deg,rgba(255,255,255,.17) 0%,rgba(255,255,255,.07) 100%);
   box-shadow:0 1px 0 rgba(255,255,255,.28) inset,0 4px 16px rgba(0,0,0,.4),0 0 26px rgba(245,245,247,.09);
   transition:transform .55s var(--ease)}
 #tools[data-active="crop"] .tab-ind{transform:translateX(100%)}
-#tools[data-active="lot"] .tab-ind{transform:translateX(200%)}
+#tools[data-active="styles"] .tab-ind{transform:translateX(200%)}
+#tools[data-active="lot"] .tab-ind{transform:translateX(300%)}
 #tools button{position:relative;z-index:1;height:40px;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:999px;
   color:var(--dim);font-weight:560;font-size:14px;transition:color .3s,transform .3s var(--ease)}
 #tools button .ic{width:18px;height:18px}
@@ -443,13 +444,99 @@ select option{background:#1b1b1d;color:var(--text)}
 #dlg input:focus{box-shadow:0 0 0 1.5px rgba(245,245,247,.6) inset,0 0 20px rgba(245,245,247,.08)}
 #dlg .card{position:relative;border-radius:28px;padding:24px 22px 20px}
 
+/* ===== 14. ESTILS ===== */
+.stStrip{display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;padding:9px 14px 4px;scrollbar-width:none;touch-action:pan-x;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 calc(100% - 22px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 12px,#000 calc(100% - 22px),transparent 100%)}
+.stStrip::-webkit-scrollbar{display:none}
+.stl{flex:none;width:68px;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);transition:transform .3s var(--ease),color .2s}
+.stl .tile{width:68px;height:60px;border-radius:15px;overflow:hidden;display:grid;place-items:center;background:rgba(255,255,255,.05);
+  box-shadow:0 0 0 1px rgba(245,245,247,.10) inset;transition:box-shadow .3s var(--ease),transform .3s var(--ease)}
+.stl .tile img{width:100%;height:100%;object-fit:cover;display:block}
+.stl .tile img:not([src]){visibility:hidden}
+.stl .nm{font-size:11.5px;line-height:14px;max-width:68px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stl.act .tile{background:rgba(255,255,255,.04);color:var(--text);box-shadow:0 0 0 1.5px rgba(245,245,247,.2) inset}
+.stl.act .tile .ic{width:22px;height:22px}
+.stl.sel .nm,.stl.on .nm{color:var(--text)}
+.stl.on .tile{box-shadow:0 0 0 2px var(--text),0 0 20px var(--glow)}
+.stl.sel:not(.on) .tile{box-shadow:0 0 0 1.5px rgba(245,245,247,.55) inset}
+@media (hover:hover){.stl:hover{color:var(--text)}.stl:hover .tile{transform:scale(1.04)}}
+.stl:active .tile{transform:scale(.95)}
+.stActs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:4px 14px 0}
+.stActs .btn{height:32px;padding:0 6px;justify-content:center;font-size:12px;gap:5px;white-space:nowrap;box-shadow:0 0 0 1px rgba(245,245,247,.08) inset}
+.stActs .btn .ic{width:15px;height:15px}
+#tools button{font-size:13.5px;gap:6px}
+@media (max-width:400px){#tools button .ic{width:16px;height:16px}#tools button{font-size:12.5px;gap:5px}}
+
+/* ===== 15. EXTRACCIÓ D'ESTIL ===== */
+#dock.ex > :not(#extract){display:none}
+#extract{padding:10px 0 4px;animation:panelIn .45s var(--ease) both}
+#extract[hidden]{display:none}
+.exHead{display:flex;align-items:center;gap:12px;padding:4px 18px 2px}
+#exRef{width:52px;height:52px;border-radius:14px;object-fit:cover;box-shadow:0 0 0 1px rgba(245,245,247,.16),0 8px 20px rgba(0,0,0,.5);flex:none}
+.exTitle{font-family:var(--serif);font-style:italic;font-size:24px;line-height:1.05}
+.exSub{margin-top:3px;color:var(--muted);font-size:12.5px;line-height:1.3}
+.exActs{display:flex;align-items:center;gap:8px;padding:4px 14px 6px}
+.exActs .grow{flex:1}
+.exActs .btn{height:38px;padding:0 14px;white-space:nowrap;font-size:13px}
+.exActs .btn .ic{width:16px;height:16px}
+
+/* ===== 16. INICI ===== */
+#home{position:fixed;inset:0;z-index:14;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  background:radial-gradient(90% 45% at 50% 0%,rgba(245,245,247,.08),transparent 70%),rgba(10,10,10,.96);
+  -webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px)}
+#home[hidden]{display:none}
+#home.in .homeIn>*{animation:libIn .55s var(--ease) both}
+#home.in .homeIn>*:nth-child(2){animation-delay:.05s}#home.in .homeIn>*:nth-child(3){animation-delay:.1s}
+#home.in .homeIn>*:nth-child(4){animation-delay:.15s}#home.in .homeIn>*:nth-child(5){animation-delay:.2s}
+.homeIn{max-width:640px;margin:0 auto;padding:calc(var(--safe-t) + 34px) 18px calc(var(--safe-b) + 30px)}
+.homeHead .hi{font-family:var(--serif);font-style:italic;font-size:44px;line-height:1}
+.homeHead .hsub{margin-top:6px;color:var(--muted);font-size:14px}
+.continue{display:flex;align-items:center;gap:14px;width:100%;margin-top:22px;padding:12px;border-radius:24px;text-align:left;color:inherit;
+  background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.04));box-shadow:0 0 0 1px rgba(245,245,247,.16) inset,0 18px 40px rgba(0,0,0,.5);
+  transition:transform .35s var(--ease),box-shadow .35s var(--ease)}
+.continue[hidden]{display:none}
+@media (hover:hover){.continue:hover{transform:scale(1.015);box-shadow:0 0 0 1px rgba(245,245,247,.3) inset,0 22px 48px rgba(0,0,0,.55),0 0 34px rgba(245,245,247,.08)}}
+.continue:active{transform:scale(.975);transition-duration:.08s}
+.cvr{position:relative;width:84px;height:84px;border-radius:16px;overflow:hidden;flex:none;background:rgba(255,255,255,.05);display:grid;place-items:center}
+.cvr img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.cvr img[hidden]{display:none}
+.cph{color:var(--muted)}.cph .ic{width:26px;height:26px}
+.ctx{display:flex;flex-direction:column;min-width:0;flex:1}
+.clabel{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.cname{font-family:var(--serif);font-style:italic;font-size:26px;line-height:1.1;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cmeta{margin-top:3px;color:var(--muted);font-size:12.5px}
+.go{width:38px;height:38px;border-radius:50%;background:#f5f5f7;color:#0a0a0a;display:grid;place-items:center;flex:none}
+.qa{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.qbtn{display:flex;align-items:center;gap:10px;padding:14px;border-radius:18px;color:inherit;text-align:left;font-size:13.5px;line-height:1.2;
+  background:rgba(255,255,255,.05);box-shadow:0 0 0 1px rgba(245,245,247,.12) inset;transition:transform .3s var(--ease),background .3s}
+.qbtn .ic{width:20px;height:20px;flex:none}
+@media (hover:hover){.qbtn:hover{transform:scale(1.02);background:rgba(255,255,255,.09)}}
+.qbtn:active{transform:scale(.97);transition-duration:.08s}
+.hsec{margin-top:26px}.hsec[hidden]{display:none}
+.hsecHead{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px}
+.hsecHead h3{font-family:var(--serif);font-style:italic;font-weight:400;font-size:22px;margin:0}
+.link{color:var(--muted);font-size:12.5px;text-decoration:underline;text-underline-offset:3px}
+.hrow{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;margin:0 -18px;padding:2px 18px 6px}
+.hrow::-webkit-scrollbar{display:none}
+.hf{flex:none;width:120px;text-align:left;color:inherit;transition:transform .3s var(--ease)}
+.hf:active{transform:scale(.96)}
+@media (hover:hover){.hf:hover{transform:translateY(-3px)}}
+.hcv{display:grid;place-items:center;width:120px;height:120px;border-radius:18px;overflow:hidden;background:rgba(255,255,255,.05);box-shadow:0 0 0 1px rgba(245,245,247,.12) inset,0 10px 24px rgba(0,0,0,.45);color:var(--muted)}
+.hcv img{width:100%;height:100%;object-fit:cover}
+.hn{display:block;margin-top:7px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm{display:block;font-size:11.5px;color:var(--muted)}
+.hrow.chips{flex-wrap:wrap;overflow:visible;margin:0;padding:0}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border-radius:999px;color:inherit;font-size:13px;background:rgba(255,255,255,.06);box-shadow:0 0 0 1px rgba(245,245,247,.14) inset;transition:transform .3s var(--ease)}
+.chip:active{transform:scale(.96)}.chip .ic{width:15px;height:15px}
+.hempty{color:var(--muted);font-size:13px;line-height:1.4;margin:0}
+
 </style>
 </head>
 <body>
 
 <!-- Iconos Lucide (ISC) incrustats: no cal connexió ni CDN -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
-  <symbol id="i-folder-open" viewBox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2" /></symbol>
+  <symbol id="i-house" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+<symbol id="i-folder-open" viewBox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2" /></symbol>
   <symbol id="i-columns-2" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2" /> <path d="M12 3v18" /></symbol>
   <symbol id="i-undo-2" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5" /> <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11" /></symbol>
   <symbol id="i-redo-2" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5" /> <path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5A5.5 5.5 0 0 0 9.5 20H13" /></symbol>
@@ -461,6 +548,9 @@ select option{background:#1b1b1d;color:var(--text)}
   <symbol id="i-flip-horizontal-2" viewBox="0 0 24 24"><path d="M10 12H8" /> <path d="M16 12h-2" /> <path d="M22 12h-2" /> <path d="M4 12H2" /> <path d="M7.298 20.288A1 1 0 008 22h8a1 1 0 00.703-1.712l-3.991-3.99a1 1 0 00-1.424-.001z" /> <path d="M7.298 3.712A1 1 0 018 2h8a1 1 0 01.703 1.712l-3.991 3.99a1 1 0 01-1.424.001z" /></symbol>
   <symbol id="i-flip-vertical-2" viewBox="0 0 24 24"><path d="M12 14v2" /> <path d="M12 20v2" /> <path d="M12 2v2" /> <path d="M12 8v2" /> <path d="M20.288 16.703A1 1 0 0022 16V8a1 1 0 00-1.712-.703l-3.99 3.991a1 1 0 00-.001 1.424z" /> <path d="M3.712 16.703A1 1 0 012 16V8a1 1 0 011.712-.703l3.99 3.991a1 1 0 01.001 1.424z" /></symbol>
   <symbol id="i-image-plus" viewBox="0 0 24 24"><path d="M16 5h6" /> <path d="M19 2v6" /> <path d="M21 11.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7.5" /> <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /> <circle cx="9" cy="9" r="2" /></symbol>
+  <symbol id="i-wand-sparkles" viewBox="0 0 24 24"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72" /> <path d="m14 7 3 3" /> <path d="M5 6v4" /> <path d="M19 14v4" /> <path d="M10 2v2" /> <path d="M7 8H3" /> <path d="M21 16h-4" /> <path d="M11 3H9" /></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 3v12" /> <path d="m17 8-5-5-5 5" /> <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14" /> <path d="M12 5v14" /></symbol>
   <symbol id="i-folder" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></symbol>
   <symbol id="i-folder-plus" viewBox="0 0 24 24"><path d="M12 10v6" /> <path d="M9 13h6" /> <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></symbol>
   <symbol id="i-folder-down" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /> <path d="M12 10v6" /> <path d="m15 13-3 3-3-3" /></symbol>
@@ -516,6 +606,7 @@ select option{background:#1b1b1d;color:var(--text)}
       <span class="tab-ind" aria-hidden="true"></span>
       <button id="tabAdj" class="on" role="tab" aria-selected="true"><svg class="ic" aria-hidden="true"><use href="#i-sliders-horizontal"/></svg><span data-i18n="tabAdjust">Ajustos</span></button>
       <button id="tabCrop" role="tab" aria-selected="false"><svg class="ic" aria-hidden="true"><use href="#i-crop"/></svg><span data-i18n="tabCrop">Retall</span></button>
+      <button id="tabStyles" role="tab" aria-selected="false"><svg class="ic" aria-hidden="true"><use href="#i-wand-sparkles"/></svg><span data-i18n="tabStyles">Estils</span></button>
       <button id="tabLot" role="tab" aria-selected="false"><svg class="ic" aria-hidden="true"><use href="#i-images"/></svg><span data-i18n="tabLot">Lot</span></button>
     </div>
 
@@ -553,6 +644,34 @@ select option{background:#1b1b1d;color:var(--text)}
         <button class="btn ghost" id="btnCropReset" data-i18n="resetCrop">Restableix</button>
       </div>
     </div>
+    <!-- Pestanya: estils desats -->
+    <div id="panelStyles" class="panel" hidden>
+      <div class="stStrip" id="stStrip"></div>
+      <div class="stActs">
+        <button class="btn" id="stAll" disabled><svg class="ic" aria-hidden="true"><use href="#i-layers"/></svg><span data-i18n="stAll">A totes</span></button>
+        <button class="btn" id="stExport"><svg class="ic" aria-hidden="true"><use href="#i-download"/></svg><span data-i18n="stExport">Exporta</span></button>
+        <button class="btn" id="stRename" disabled><svg class="ic" aria-hidden="true"><use href="#i-pencil"/></svg><span data-i18n="stRename">Nom</span></button>
+        <button class="btn" id="stDelete" disabled><svg class="ic" aria-hidden="true"><use href="#i-trash-2"/></svg><span id="stDelLabel" data-i18n="stDelete">Elimina</span></button>
+      </div>
+    </div>
+
+    <!-- Estil extret d'una foto de referència: previsualització amb intensitat -->
+    <div id="extract" hidden>
+      <div class="exHead"><img id="exRef" alt=""><div class="exTxt"><div class="exTitle" data-i18n="exTitle">Estil extret</div><div class="exSub" id="exSub"></div></div></div>
+      <div class="sliderRow">
+        <button class="nudge" id="nudgeEL" data-i18n-title="tipFineL" aria-label="-1"><svg class="ic" aria-hidden="true"><use href="#i-chevron-left"/></svg></button>
+        <input type="range" id="exSlider" min="0" max="150" step="1" value="100" aria-label="Intensitat">
+        <button class="nudge" id="nudgeER" data-i18n-title="tipFineR" aria-label="+1"><svg class="ic" aria-hidden="true"><use href="#i-chevron-right"/></svg></button>
+        <span class="val" id="exVal">100%</span>
+      </div>
+      <div class="exActs">
+        <button class="btn ghost" id="exCancel" data-i18n="cancel">Cancel·la</button>
+        <span class="grow"></span>
+        <button class="btn" id="exSave"><svg class="ic" aria-hidden="true"><use href="#i-wand-sparkles"/></svg><span data-i18n="exSave">Desa l'estil</span></button>
+        <button class="btn primary" id="exApply" data-i18n="exApply">Aplica</button>
+      </div>
+    </div>
+
     <!-- Pestanya: lot de fotos -->
     <div id="panelLot" class="panel" hidden>
       <div class="lotRow4">
@@ -598,18 +717,37 @@ select option{background:#1b1b1d;color:var(--text)}
 <div id="library" hidden>
   <header class="libTop">
     <button class="ibtn" id="libClose" data-i18n-title="close" aria-label="Tanca"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+    <button class="ibtn" id="libHome" data-i18n-title="tipHome" aria-label="Inici"><svg class="ic" aria-hidden="true"><use href="#i-house"/></svg></button>
     <h2 data-i18n="folders">Carpetes</h2>
     <button class="pill sm" id="libImport"><svg class="ic" aria-hidden="true"><use href="#i-folder-down"/></svg><span data-i18n="importFolder">Importa</span></button>
   </header>
   <div class="libBody"><div id="libGrid"></div><p id="libEmpty" class="libEmpty" hidden data-i18n="libEmpty"></p></div>
 </div>
 
+<!-- Pantalla d'inici -->
+<div id="home" hidden>
+  <div class="homeIn">
+    <header class="homeHead"><div class="hi" id="homeHi"></div><div class="hsub" data-i18n="homeSub">Què vols editar avui?</div></header>
+    <button class="continue" id="homeCont"><span class="cvr"><img id="homeCover" alt=""><span class="cph"><svg class="ic" aria-hidden="true"><use href="#i-images"/></svg></span></span>
+      <span class="ctx"><span class="clabel" id="homeContLabel"></span><span class="cname" id="homeContName"></span><span class="cmeta" id="homeContMeta"></span></span>
+      <span class="go"><svg class="ic" aria-hidden="true"><use href="#i-chevron-right"/></svg></span></button>
+    <div class="qa">
+      <button class="qbtn" id="qaPhotos"><svg class="ic" aria-hidden="true"><use href="#i-image-plus"/></svg><span data-i18n="qaPhotos">Afegeix fotos</span></button>
+      <button class="qbtn" id="qaNew"><svg class="ic" aria-hidden="true"><use href="#i-folder-plus"/></svg><span data-i18n="qaNew">Nova carpeta</span></button>
+      <button class="qbtn" id="qaImport"><svg class="ic" aria-hidden="true"><use href="#i-folder-down"/></svg><span data-i18n="qaImport">Importa carpeta</span></button>
+      <button class="qbtn" id="qaStyle"><svg class="ic" aria-hidden="true"><use href="#i-wand-sparkles"/></svg><span data-i18n="qaStyle">Extreu estil d'una foto</span></button>
+    </div>
+    <section class="hsec" id="homeRecentSec"><div class="hsecHead"><h3 data-i18n="homeRecent">Darreres carpetes</h3><button class="link" id="homeAll" data-i18n="homeAll">Veure-les totes</button></div><div class="hrow" id="homeRecent"></div></section>
+    <section class="hsec"><div class="hsecHead"><h3 data-i18n="homeStyles">Els meus estils</h3></div><div class="hrow chips" id="homeStyles"></div></section>
+  </div>
+</div>
+
 <!-- Diàleg de nom de carpeta -->
 <div id="dlg" hidden>
   <form class="card" id="dlgForm" autocomplete="off">
     <h2 id="dlgTitle"></h2>
-    <div class="field col"><label for="dlgName" data-i18n="folderName">Nom de la carpeta</label><input id="dlgName" type="text" maxlength="80" placeholder="JA vs Rioollet"></div>
-    <div class="field col"><label for="dlgDate" data-i18n="folderDate">Data</label><input id="dlgDate" type="date"></div>
+    <div class="field col"><label for="dlgName" id="dlgNameLabel" data-i18n="folderName">Nom de la carpeta</label><input id="dlgName" type="text" maxlength="80" placeholder="JA vs Rioollet"></div>
+    <div class="field col" id="dlgDateField"><label for="dlgDate" data-i18n="folderDate">Data</label><input id="dlgDate" type="date"></div>
     <div class="row sheetActions">
       <button type="button" class="btn ghost" id="dlgCancel" data-i18n="cancel">Cancel·la</button>
       <span class="grow"></span>
@@ -620,6 +758,8 @@ select option{background:#1b1b1d;color:var(--text)}
 
 <div id="toast" role="status" aria-live="polite"></div>
 <input type="file" id="fileIn" accept="image/*" multiple hidden>
+<input type="file" id="refIn" accept="image/*" hidden>
+<input type="file" id="styleIn" accept=".json,application/json" multiple hidden>
 <input type="file" id="dirIn" webkitdirectory multiple hidden>
 
 <script>/* js/i18n.js */
@@ -641,6 +781,19 @@ select option{background:#1b1b1d;color:var(--text)}
       folderName: 'Nom de la carpeta', folderDate: 'Data', newFolderTitle: 'Nova carpeta', renameTitle: 'Canvia el nom',
       photosN: '{n} fotos', photoN1: '1 foto', openNow: 'Oberta', delSure: 'Segur?', tipRename: 'Canvia el nom', tipDelete: 'Elimina la carpeta',
       folderAuto: 'Carpeta', folderOld: 'Sessió anterior', toastFolderDeleted: 'Carpeta eliminada', toastNoImgs: 'No hi ha cap imatge en aquesta carpeta',
+      tabStyles: 'Estils', stAll: 'A totes', stExport: 'Exporta', stRename: 'Nom', stDelete: 'Elimina', stSure: 'Segur?',
+      stNew: 'Desa', stImport: 'Importa', styleName: 'Nom de l\'estil', newStyleTitle: 'Desa aquest estil', renameStyleTitle: 'Canvia el nom de l\'estil',
+      toastNoAdj: 'Primer fes algun ajust per poder-lo desar', toastStyleSaved: 'Estil desat', toastStyleApplied: 'Estil aplicat', toastStyleAll: 'Estil aplicat a {n} fotos',
+      toastStylesImported: 'Estils importats · {n}', toastStyleBad: 'Aquest fitxer no és un estil de Lumen', toastStyleDeleted: 'Estil eliminat',
+      stRef: 'Referència', exTitle: 'Estil extret', exSave: 'Desa l\'estil', exApply: 'Aplica', exName: 'Estil extret',
+      exWarm: 'càlid', exCool: 'fred', exContrastHi: 'contrast alt', exContrastLo: 'suau', exVivid: 'colors vius', exMuted: 'colors apagats', exBW: 'blanc i negre',
+      exBright: 'lluminós', exDark: 'fosc', exVignette: 'vinyeta', exFaded: 'negres aixecats', exNeutral: 'estil molt neutre',
+      toastExApplied: 'Estil aplicat', toastExBad: 'No s\'ha pogut analitzar aquesta imatge',
+      homeTitle: 'Inici', hiMorning: 'Bon dia', hiAfternoon: 'Bona tarda', hiNight: 'Bona nit', homeSub: 'Què vols editar avui?',
+      homeContinue: 'Continua', homeContinueEmpty: 'Comença',
+      qaPhotos: 'Afegeix fotos', qaNew: 'Nova carpeta', qaImport: 'Importa carpeta', qaStyle: 'Extreu estil d\'una foto',
+      homeRecent: 'Darreres carpetes', homeAll: 'Veure-les totes', homeStyles: 'Els meus estils', homeNoStyles: 'Encara no tens estils desats. Extreu-ne un d\'una foto o desa\'n un des d\'Estils.',
+      tipHome: 'Inici', homeEnter: 'Entra a l\'editor',
       photoOf: 'Foto {a} de {b}', onePhoto: 'Una sola foto. Afegeix-ne més per treballar en lot.',
       addPhotos: 'Afegeix fotos', removePhoto: 'Treu aquesta foto del lot',
       copyAdj: 'Copia ajustos', pasteAdj: 'Enganxa ajustos', pasteSel: 'Enganxa a {n}', applyAll: 'Aplica a totes',
@@ -1441,7 +1594,7 @@ select option{background:#1b1b1d;color:var(--text)}
   L.syncUI = syncUI;
 
   /* ---------- Pestanyes (Ajustos · Retall · Lot) ---------- */
-  const TAB = { adjust: 'Adj', crop: 'Crop', lot: 'Lot' };
+  const TAB = { adjust: 'Adj', crop: 'Crop', styles: 'Styles', lot: 'Lot' };
   function applyTabs(m) {
     Object.keys(TAB).forEach((k) => {
       $('tab' + TAB[k]).classList.toggle('on', k === m);
@@ -1462,6 +1615,7 @@ select option{background:#1b1b1d;color:var(--text)}
   L.setMode = setMode;
   $('tabAdj').addEventListener('click', () => setMode('adjust'));
   $('tabCrop').addEventListener('click', () => setMode('crop'));
+  $('tabStyles').addEventListener('click', () => setMode('styles'));
   $('tabLot').addEventListener('click', () => setMode('lot'));
 
   /* ---------- Gestos de la vista: zoom i desplaçament ---------- */
@@ -1653,6 +1807,7 @@ select option{background:#1b1b1d;color:var(--text)}
 
   /* Activa la foto i-èssima. Retorna true / false (cancel·lada o ja activa) / 'err' (no s'ha pogut obrir) */
   async function activate(i, dir) {
+    if (L.lock) return false;                    // mentre s'extreu un estil no es pot canviar de foto
     if (!engine) { toast(t('toastNoGL')); return 'err'; }
     if (i < 0 || i >= items.length) return false;
     if (i === L.cur && S.has) return true;
@@ -1741,6 +1896,7 @@ select option{background:#1b1b1d;color:var(--text)}
     const list = [...files].filter((f) => f && (f.type || '').startsWith('image/'));
     if (!list.length) { toast(t('toastErrOpen')); return; }
     await L.ensureFolder();
+    if (L.home) L.home.close();
     const first = items.length;
     list.forEach((f) => { const it = newItem(f, nid++); items.push(it); LumenStore.putFile(it.id, f, f.name || it.name, f.type); });
     LumenStore.persist();
@@ -2101,7 +2257,7 @@ select option{background:#1b1b1d;color:var(--text)}
   const ro = new ResizeObserver(() => L.draw());
   [stage, dock, bar].forEach((el) => ro.observe(el));
   window.addEventListener('orientationchange', () => setTimeout(L.draw, 200));
-  L.restoreSession().catch((e) => console.warn('restore', e));
+  L.restoreSession().catch((e) => console.warn('restore', e)).finally(() => { if (L.home) L.home.open(); });
 })();
 
 </script>
@@ -2422,6 +2578,8 @@ select option{background:#1b1b1d;color:var(--text)}
     clearTimeout(clearT); clearT = 0; $('clearLabel').textContent = t('clearLot');
     picked.clear(); selMode = false; L.clearAll();
   });
+  L.applyAdjTo = applyTo;
+  L.markStrip = mark;
   L.getClip = () => clip;
   L.setClip = (c) => { clip = c || null; info(); };
 
@@ -2444,9 +2602,11 @@ select option{background:#1b1b1d;color:var(--text)}
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
   /* ---------- Diàleg (nom + data) ---------- */
-  function ask(title, name, date) {
+  function ask(title, name, date, opts) {
+    opts = opts || {};
     return new Promise((res) => {
       const dlg = $('dlg'), nm = $('dlgName'), dt = $('dlgDate');
+      $('dlgDateField').hidden = !!opts.noDate; $('dlgNameLabel').textContent = t(opts.nameLabel || 'folderName'); nm.placeholder = opts.placeholder || 'JA vs Rioollet';
       $('dlgTitle').textContent = title; nm.value = name || ''; dt.value = date || L.todayISO();
       dlg.hidden = false; setTimeout(() => nm.focus(), 60);
       const done = (v) => { dlg.hidden = true; $('dlgForm').onsubmit = null; $('dlgCancel').onclick = null; dlg.onpointerdown = null; res(v); };
@@ -2455,6 +2615,8 @@ select option{background:#1b1b1d;color:var(--text)}
       dlg.onpointerdown = (e) => { if (e.target === dlg) done(null); };
     });
   }
+
+  L.ask = ask;
 
   /* ---------- Llista ---------- */
   function sorted() {
@@ -2495,7 +2657,7 @@ select option{background:#1b1b1d;color:var(--text)}
         setTimeout(() => { if (act.isConnected) { act.classList.remove('arm'); act.innerHTML = svg('trash-2'); } }, 3000);
       } else { await L.deleteFolder(id); L.toast(t('toastFolderDeleted')); render(); }
     } else {
-      await L.openFolder(id); close();
+      await L.openFolder(id); done();
     }
   });
   grid.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.classList.contains('fcard') && !e.target.classList.contains('new')) e.target.click(); });
@@ -2503,7 +2665,7 @@ select option{background:#1b1b1d;color:var(--text)}
   async function newFolder() {
     const r = await ask(t('newFolderTitle'), '', L.todayISO()); if (!r) return;
     await L.createFolder(r.name || t('folderAuto'), r.date);
-    close(); setTimeout(() => $('fileIn').click(), 0);       // directament a triar les fotos
+    done(); setTimeout(() => $('fileIn').click(), 0);       // directament a triar les fotos
   }
 
   /* Importar una carpeta sencera del dispositiu (Chrome d'escriptori); al mòbil s'obre el selector de fotos */
@@ -2517,17 +2679,442 @@ select option{background:#1b1b1d;color:var(--text)}
     let name = rel ? rel.split('/')[0] : '';
     if (!name) { const r = await ask(t('newFolderTitle'), '', L.todayISO()); if (!r) return; name = r.name; await L.createFolder(name || t('folderAuto'), r.date); }
     else await L.createFolder(name, L.todayISO());
-    close(); await L.addFiles(files);
+    done(); await L.addFiles(files);
   });
 
   /* ---------- Obrir / tancar ---------- */
   function open() { render(); lib.hidden = false; lib.classList.remove('in'); void lib.offsetWidth; lib.classList.add('in'); }
   function close() { lib.hidden = true; }
-  L.library = { open, close };
+  function done() { lib.hidden = true; if (L.home) L.home.close(); }   // acció feta: es tanca també l'inici
+  L.library = { open, close, newFolder };
   L.hooks.openLibrary = open;
   $('btnFolder').addEventListener('click', open);
   $('libClose').addEventListener('click', close);
   window.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (!$('dlg').hidden) $('dlgCancel').click(); else if (!lib.hidden) close(); } });
+})();
+
+</script>
+<script>/* js/styles.js */
+/* Lumen — estils desats. Un estil és un conjunt d'ajustos de color amb nom (no inclou retall ni gir).
+   Es desen al dispositiu, s'apliquen amb un toc (a la foto o a tot el lot) i s'importen/exporten en JSON.
+
+   Format del fitxer (el mateix que farà servir l'extracció d'estil a partir d'una foto de referència):
+   { "lumen": 1, "type": "style", "name": "Cinema", "created": "2026-10-23", "source": "manual",
+     "adj": { "brightness": -0.05, "contrast": 0.2, "saturation": -0.1, "ambience": 0.1, "highlights": -0.2,
+              "shadows": 0.15, "warmth": 0.1, "tint": 0, "sharpen": 0.2, "vignette": -0.2 } }
+   Valors entre -1 i 1 (nitidesa entre 0 i 1). Diversos estils: { "lumen": 1, "type": "styles", "styles": [ ... ] } */
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const L = window.L, S = L.S, t = L.t;
+  const KEYS = Object.keys(L.zero());
+  const strip = $('stStrip');
+
+  /* Estils inclosos per començar (no es poden eliminar) */
+  const A = (o) => Object.assign(L.zero(), o);
+  const BUILTIN = [
+    { id: 'b1', name: 'Natural', builtin: true, adj: A({ contrast: 0.08, saturation: 0.1, ambience: 0.15, shadows: 0.12, sharpen: 0.2 }) },
+    { id: 'b2', name: 'Vius', builtin: true, adj: A({ contrast: 0.18, saturation: 0.35, ambience: 0.25, highlights: -0.15, sharpen: 0.3 }) },
+    { id: 'b3', name: 'Cinema', builtin: true, adj: A({ brightness: -0.04, contrast: 0.28, saturation: -0.15, highlights: -0.25, shadows: 0.1, warmth: -0.08, tint: -0.05, vignette: -0.3 }) },
+    { id: 'b4', name: 'Càlid', builtin: true, adj: A({ brightness: 0.04, contrast: 0.1, saturation: 0.12, warmth: 0.32, highlights: -0.12, vignette: -0.12 }) },
+    { id: 'b5', name: 'Fred', builtin: true, adj: A({ contrast: 0.12, saturation: -0.08, warmth: -0.32, shadows: 0.08, sharpen: 0.25 }) },
+    { id: 'b6', name: 'B/N', builtin: true, adj: A({ contrast: 0.3, saturation: -1, ambience: 0.2, highlights: -0.15, shadows: 0.1, sharpen: 0.3, vignette: -0.25 }) }
+  ];
+  let mine = [];                 // estils de l'usuari (persistits)
+  let sel = null;                // id de l'estil seleccionat
+  const all = () => mine.concat(BUILTIN);
+  const find = (id) => all().find((s) => s.id === id);
+
+  /* ---------- Persistència ---------- */
+  const save = () => LumenStore.setMeta('styles', mine.map(({ id, name, adj, created, source }) => ({ id, name, adj, created, source })));
+  const nextId = () => 'u' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+  /* ---------- Validació (importació) ---------- */
+  const r3 = (v) => Math.round(v * 1000) / 1000;
+  function clean(o) {
+    if (!o || typeof o !== 'object' || !o.adj || typeof o.adj !== 'object') return null;
+    const adj = L.zero(); let any = false;
+    KEYS.forEach((k) => {
+      let v = Number(o.adj[k]); if (!isFinite(v)) v = 0;
+      v = k === 'sharpen' ? Math.min(1, Math.max(0, v)) : Math.min(1, Math.max(-1, v));
+      adj[k] = r3(v); if (v !== 0) any = true;
+    });
+    if (!any) return null;
+    return { id: nextId(), name: String(o.name || 'Estil').slice(0, 60), adj, created: String(o.created || L.todayISO()).slice(0, 10), source: o.source === 'extracted' ? 'extracted' : 'manual' };
+  }
+  function parseFile(text) {
+    const j = JSON.parse(text);
+    if (!j || j.lumen !== 1) return [];
+    const list = j.type === 'styles' && Array.isArray(j.styles) ? j.styles : j.type === 'style' ? [j] : [];
+    return list.map(clean).filter(Boolean);
+  }
+  const toFile = (s) => ({ lumen: 1, type: 'style', name: s.name, created: s.created || L.todayISO(), source: s.source || 'manual',
+    adj: Object.fromEntries(KEYS.map((k) => [k, r3(s.adj[k] || 0)])) });
+
+  /* ---------- Miniatures: la foto actual amb cada estil aplicat ---------- */
+  const thumbs = new Map();       // id -> dataURL (per a la foto actual)
+  let thumbFor = '', thumbTimer = 0;
+  function renderThumbs() {
+    const e = L.engine, it = L.items[L.cur];
+    if (!e || !e.tex || !S.has || !it) return;
+    const key = it.id + ':' + e.cur + ':' + JSON.stringify(S.geo.crop);
+    const want = all().map((s) => s.id + (thumbs.has(s.id) ? '' : '?')).join(',');
+    if (thumbFor === key && !/\?/.test(want)) return;
+    if (thumbFor !== key) thumbs.clear();
+    thumbFor = key;
+    const f = e.constructor.frameSize(e.srcW, e.srcH, 0), m = Math.min(f.w, f.h);
+    const crop = { x: (f.w - m) / 2, y: (f.h - m) / 2, w: m, h: m };
+    const geo = { rot: 0, flipH: false, flipV: false, angle: 0, crop };
+    const T = 96, c = document.createElement('canvas'); c.width = c.height = T; const x = c.getContext('2d');
+    all().forEach((s) => {
+      if (thumbs.has(s.id)) return;
+      e.render(T, T, geo, s.adj, crop); x.clearRect(0, 0, T, T); x.drawImage(e.canvas, 0, 0);
+      thumbs.set(s.id, c.toDataURL('image/jpeg', 0.7));
+    });
+    L.draw();                                   // el motor és compartit: es torna a pintar la vista principal
+    paintThumbs();
+  }
+  const thumbsSoon = () => { clearTimeout(thumbTimer); thumbTimer = setTimeout(() => { if (S.mode === 'styles') renderThumbs(); }, 120); };
+
+  /* ---------- Interfície ---------- */
+  const svg = (id) => '<svg class="ic" aria-hidden="true"><use href="#i-' + id + '"/></svg>';
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const same = (a, b) => KEYS.every((k) => Math.abs((a[k] || 0) - (b[k] || 0)) < 0.005);
+  function render() {
+    strip.innerHTML = '';
+    const mk = (cls, inner, handler, label) => {
+      const b = document.createElement('button'); b.className = 'stl ' + cls; b.innerHTML = inner;
+      if (label) b.setAttribute('aria-label', label); b.addEventListener('click', handler); strip.appendChild(b); return b;
+    };
+    mk('act', '<span class="tile">' + svg('plus') + '</span><span class="nm">' + esc(t('stNew')) + '</span>', saveCurrent);
+    mk('act', '<span class="tile">' + svg('upload') + '</span><span class="nm">' + esc(t('stImport')) + '</span>', () => $('styleIn').click());
+    mk('act', '<span class="tile">' + svg('image-plus') + '</span><span class="nm">' + esc(t('stRef')) + '</span>', () => $('refIn').click());
+    all().forEach((s) => {
+      const b = mk('', '<span class="tile"><img alt="" ' + (thumbs.has(s.id) ? 'src="' + thumbs.get(s.id) + '"' : '') + '></span><span class="nm">' + esc(s.name) + '</span>',
+        () => choose(s.id), s.name);
+      b.dataset.id = s.id;
+    });
+    paintThumbs(); mark();
+  }
+  function paintThumbs() {
+    strip.querySelectorAll('.stl[data-id]').forEach((b) => {
+      const u = thumbs.get(b.dataset.id), im = b.querySelector('img'); if (u && im && im.getAttribute('src') !== u) im.src = u;
+    });
+  }
+  let lastSig = '';
+  function mark() {
+    const cur = S.has ? S.adj : null;
+    strip.querySelectorAll('.stl[data-id]').forEach((b) => {
+      const s = find(b.dataset.id);
+      b.classList.toggle('sel', b.dataset.id === sel);
+      b.classList.toggle('on', !!(cur && s && same(cur, s.adj)));
+    });
+    const s = find(sel);
+    $('stAll').disabled = !s; $('stRename').disabled = !s || !!s.builtin; $('stDelete').disabled = !s || !!s.builtin;
+  }
+  L.hooks.dirty = ((prev) => () => {
+    prev();
+    if (S.mode !== 'styles') return;
+    const sig = JSON.stringify(S.adj); if (sig !== lastSig) { lastSig = sig; mark(); }
+  })(L.hooks.dirty);
+
+  function choose(id) {
+    const s = find(id); if (!s || !S.has) return;
+    sel = id; L.applyAdjTo(L.cur, s.adj); L.syncUI(); lastSig = JSON.stringify(S.adj);
+    mark(); L.markStrip(); L.toast(t('toastStyleApplied'));
+  }
+  async function saveCurrent() {
+    if (!S.has) return;
+    if (KEYS.every((k) => Math.abs(S.adj[k] || 0) < 1e-6)) { L.toast(t('toastNoAdj')); return; }
+    const r = await L.ask(t('newStyleTitle'), '', null, { noDate: true, nameLabel: 'styleName', placeholder: 'Cinema' });
+    if (!r) return;
+    const s = clean({ name: r.name || 'Estil', adj: S.adj, source: 'manual' });
+    mine.unshift(s); sel = s.id; thumbs.delete(s.id); await save(); render(); renderThumbs(); L.toast(t('toastStyleSaved'));
+  }
+  $('stRename').addEventListener('click', async () => {
+    const s = find(sel); if (!s || s.builtin) return;
+    const r = await L.ask(t('renameStyleTitle'), s.name, null, { noDate: true, nameLabel: 'styleName' });
+    if (r && r.name) { s.name = r.name.slice(0, 60); await save(); render(); }
+  });
+  let delT = 0;
+  $('stDelete').addEventListener('click', async () => {
+    const s = find(sel); if (!s || s.builtin) return;
+    if (!delT) { $('stDelLabel').textContent = t('stSure'); delT = setTimeout(() => { delT = 0; $('stDelLabel').textContent = t('stDelete'); }, 3000); return; }
+    clearTimeout(delT); delT = 0; $('stDelLabel').textContent = t('stDelete');
+    mine = mine.filter((x) => x.id !== s.id); sel = null; thumbs.delete(s.id); await save(); render(); L.toast(t('toastStyleDeleted'));
+  });
+  $('stAll').addEventListener('click', () => {
+    const s = find(sel); if (!s || !S.has) return;
+    L.items.forEach((it, i) => L.applyAdjTo(i, s.adj));
+    L.syncUI(); lastSig = JSON.stringify(S.adj); mark(); L.markStrip(); L.toast(t('toastStyleAll').replace('{n}', L.items.length));
+  });
+
+  /* ---------- Importar / exportar JSON ---------- */
+  $('styleIn').addEventListener('change', async () => {
+    const files = [...$('styleIn').files]; $('styleIn').value = '';
+    let added = [];
+    for (const f of files) { try { added = added.concat(parseFile(await f.text())); } catch (e) { /* JSON no vàlid */ } }
+    if (!added.length) { L.toast(t('toastStyleBad')); return; }
+    mine = added.concat(mine); sel = added[0].id; await save(); thumbs.clear(); thumbFor = ''; render(); renderThumbs();
+    L.toast(t('toastStylesImported').replace('{n}', added.length));
+  });
+  $('stExport').addEventListener('click', async () => {
+    const s = find(sel);
+    const list = s ? [s] : mine;
+    if (!list.length) { L.toast(t('toastNoAdj')); return; }
+    const body = list.length === 1 ? toFile(list[0]) : { lumen: 1, type: 'styles', styles: list.map(toFile) };
+    const slug = list.length === 1 ? list[0].name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'estil' : 'estils';
+    const blob = new Blob([JSON.stringify(body, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'lumen-' + slug + '.json';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 15000);
+  });
+
+  /* ---------- Quan es mostra la pestanya / canvia la foto ---------- */
+  const tab = $('tabStyles');
+  tab.addEventListener('click', () => { lastSig = ''; render(); setTimeout(renderThumbs, 60); });
+  const prevItems = L.hooks.items;
+  L.hooks.items = () => { prevItems(); thumbFor = ''; if (S.mode === 'styles') { thumbsSoon(); } };
+  /* La foto activa canvia (o s'edita el retall) => cal refer les miniatures */
+  const origDraw = L.draw; let lastCrop = '';
+  L.hooks.dirty = ((prev) => () => { prev(); if (S.mode === 'styles' && S.has) { const c = JSON.stringify(S.geo.crop) + L.cur; if (c !== lastCrop) { lastCrop = c; thumbsSoon(); } } })(L.hooks.dirty);
+
+  /* ---------- Inici ---------- */
+  (async () => {
+    const saved = await LumenStore.getMeta('styles');
+    if (Array.isArray(saved)) mine = saved.map((s) => Object.assign(clean(s) || {}, { id: s.id || nextId() })).filter((s) => s.adj);
+    render();
+  })();
+  /* Afegeix un estil (p. ex. extret d'una foto de referència) */
+  L.styles = { all, choose, mine: () => mine,
+    async add(name, adj, source) {
+      const s = clean({ name: name || 'Estil', adj, source: source || 'manual' }); if (!s) return null;
+      mine.unshift(s); sel = s.id; thumbs.delete(s.id); await save(); render(); if (S.mode === 'styles') thumbsSoon(); return s;
+    } };
+})();
+
+</script>
+<script>/* js/extract.js */
+/* Lumen — extracció d'estil d'una foto de referència (anàlisi automàtica, tot al dispositiu).
+   S'analitza la distribució de llum i color de la referència i es tradueix als mateixos 10 ajustos d'Lumen.
+   Limitació honesta: una foto acabada barreja l'estil amb el seu contingut (un capvespre és càlid per natura), per això
+   els valors s'amorteixen i hi ha un control d'INTENSITAT amb previsualització abans d'aplicar o desar. */
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const L = window.L, S = L.S, t = L.t;
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const r3 = (v) => Math.round(v * 1000) / 1000;
+
+  /* ---------- Anàlisi ---------- */
+  function analyse(data, w, h) {
+    const N = w * h, Lp = new Float32Array(N), hist = new Float32Array(256);
+    let sum = 0, satSum = 0, satN = 0, chromaSum = 0;
+    let nr = 0, nb = 0, ng = 0, nn = 0, ar = 0, ab = 0, ag = 0;
+    for (let i = 0, p = 0; i < N; i++, p += 4) {
+      const r = data[p] / 255, g = data[p + 1] / 255, b = data[p + 2] / 255;
+      const l = 0.2126 * r + 0.7152 * g + 0.0722 * b; Lp[i] = l; sum += l; hist[Math.min(255, (l * 255) | 0)]++;
+      const mx = Math.max(r, g, b), mn = Math.min(r, g, b), c = mx - mn;
+      chromaSum += c; if (mx > 0.12) { satSum += c / mx; satN++; }
+      ar += r; ab += b; ag += g;
+      if (c < 0.2 && l > 0.12 && l < 0.92) { nr += r; nb += b; ng += g; nn++; }   // gairebé neutres: indiquen la dominant de color
+    }
+    const mean = sum / N; let v = 0; for (let i = 0; i < N; i++) v += (Lp[i] - mean) * (Lp[i] - mean);
+    const sd = Math.sqrt(v / N);
+    const pct = (q) => { let a = 0; const tgt = q * N; for (let i = 0; i < 256; i++) { a += hist[i]; if (a >= tgt) return i / 255; } return 1; };
+    const useNeutral = nn > N * 0.04;
+    const R = useNeutral ? nr / nn : ar / N, B = useNeutral ? nb / nn : ab / N, G = useNeutral ? ng / nn : ag / N;
+    const damp = useNeutral ? 1 : 0.5;
+    // caixa 3x3 i caixa gran (contrast local) amb imatge integral
+    const I = new Float64Array((w + 1) * (h + 1));
+    for (let y = 0; y < h; y++) { let row = 0; for (let x = 0; x < w; x++) { row += Lp[y * w + x]; I[(y + 1) * (w + 1) + x + 1] = I[y * (w + 1) + x + 1] + row; } }
+    const box = (x, y, rad) => { const x0 = Math.max(0, x - rad), y0 = Math.max(0, y - rad), x1 = Math.min(w, x + rad + 1), y1 = Math.min(h, y + rad + 1);
+      return (I[y1 * (w + 1) + x1] - I[y0 * (w + 1) + x1] - I[y1 * (w + 1) + x0] + I[y0 * (w + 1) + x0]) / ((x1 - x0) * (y1 - y0)); };
+    let edge = 0, loc = 0;
+    for (let y = 1; y < h - 1; y += 2) for (let x = 1; x < w - 1; x += 2) {
+      const l = Lp[y * w + x]; edge += Math.abs(l - box(x, y, 1)); loc += (l - box(x, y, 7)) * (l - box(x, y, 7));
+    }
+    const cnt = Math.ceil((w - 2) / 2) * Math.ceil((h - 2) / 2); edge /= cnt; const lc = Math.sqrt(loc / cnt);
+    // vinyeta: lluminositat del centre respecte dels racons
+    const patch = (cx, cy, rr) => box(Math.round(cx * w), Math.round(cy * h), Math.round(rr * Math.min(w, h)));
+    const center = patch(0.5, 0.5, 0.18), corners = (patch(0.1, 0.1, 0.1) + patch(0.9, 0.1, 0.1) + patch(0.1, 0.9, 0.1) + patch(0.9, 0.9, 0.1)) / 4;
+    return { mean, sd, p5: pct(0.05), p50: pct(0.5), p95: pct(0.95), sat: satN ? satSum / satN : 0, chroma: chromaSum / N,
+      warm: ((R - B) / Math.max(0.05, (R + B) / 2)) * damp, tint: ((G - (R + B) / 2) / Math.max(0.05, (R + G + B) / 3)) * damp,
+      edge, lc, vig: (corners - center) / Math.max(0.08, center) };
+  }
+
+  /* Estadístiques -> ajustos. Els "valors neutres" són el que fa una foto sense retocar, i s'amorteix perquè una foto acabada no és un
+     encert exacte de l'edició. */
+  function toAdjust(a) {
+    const adj = L.zero(), D = 0.85;
+    if (a.chroma < 0.03 || a.sat < 0.06) {            // blanc i negre
+      adj.saturation = -1;
+    } else {
+      adj.saturation = clamp((a.sat - 0.40) / 0.30, -0.9, 0.9) * D;
+      adj.warmth = clamp(a.warm / 0.55, -0.8, 0.8) * D;
+      adj.tint = clamp(-a.tint / 0.10, -0.6, 0.6) * D * 0.7;
+    }
+    adj.brightness = clamp((a.mean - 0.46) * 1.5, -0.6, 0.6) * D;
+    adj.contrast = clamp((a.sd - 0.24) / 0.15, -0.7, 0.8) * D;
+    adj.highlights = clamp((a.p95 - 0.90) * 3.2, -0.6, 0.3) * D;
+    adj.shadows = clamp((a.p5 - 0.07) * 3.5, -0.4, 0.7) * D;
+    adj.ambience = clamp((a.lc - 0.075) / 0.07, -0.5, 0.7) * 0.8 * D;
+    adj.sharpen = clamp((a.edge - 0.014) / 0.03, 0, 1) * 0.55;
+    adj.vignette = a.vig > 0.12 ? -clamp((a.vig - 0.12) / 0.5, 0, 0.7) * 0.7 : 0;
+    Object.keys(adj).forEach((k) => (adj[k] = Math.abs(adj[k]) < 0.03 ? 0 : r3(adj[k])));
+    return adj;
+  }
+  /* Etiquetes en llenguatge humà de l'estil trobat */
+  function describe(adj, a) {
+    const tags = [];
+    if (adj.saturation === -1) tags.push(t('exBW'));
+    else if (adj.saturation > 0.22) tags.push(t('exVivid')); else if (adj.saturation < -0.22) tags.push(t('exMuted'));
+    if (adj.warmth > 0.18) tags.push(t('exWarm')); else if (adj.warmth < -0.18) tags.push(t('exCool'));
+    if (adj.contrast > 0.22) tags.push(t('exContrastHi')); else if (adj.contrast < -0.2) tags.push(t('exContrastLo'));
+    if (adj.brightness > 0.2) tags.push(t('exBright')); else if (adj.brightness < -0.2) tags.push(t('exDark'));
+    if (adj.vignette < -0.15) tags.push(t('exVignette'));
+    if (adj.shadows > 0.3 && a.p5 > 0.1) tags.push(t('exFaded'));
+    return tags.slice(0, 3).join(' · ') || t('exNeutral');
+  }
+  const scaled = (adj, f) => { const o = L.zero(); Object.keys(adj).forEach((k) => (o[k] = k === 'sharpen' ? clamp(adj[k] * f, 0, 1) : clamp(adj[k] * f, -1, 1))); return o; };
+
+  async function read(file) {
+    let bmp;
+    try { bmp = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
+    catch (e) { const u = URL.createObjectURL(file), im = new Image(); im.src = u; await im.decode(); bmp = im; setTimeout(() => URL.revokeObjectURL(u), 4000); }
+    const bw = bmp.width || bmp.naturalWidth, bh = bmp.height || bmp.naturalHeight, k = Math.min(1, 256 / Math.max(bw, bh));
+    const w = Math.max(8, Math.round(bw * k)), h = Math.max(8, Math.round(bh * k));
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const x = c.getContext('2d', { willReadFrequently: true }); x.imageSmoothingQuality = 'high'; x.drawImage(bmp, 0, 0, w, h);
+    const th = document.createElement('canvas'); th.width = th.height = 112; const tx = th.getContext('2d');
+    const kk = Math.max(112 / bw, 112 / bh); tx.drawImage(bmp, (112 - bw * kk) / 2, (112 - bh * kk) / 2, bw * kk, bh * kk);
+    if (bmp.close) bmp.close();
+    return { stats: analyse(x.getImageData(0, 0, w, h).data, w, h), thumb: th.toDataURL('image/jpeg', 0.75) };
+  }
+  L.extractStats = { analyse, toAdjust };   // (per a proves)
+
+  /* ---------- Panell de previsualització ---------- */
+  const dock = $('dock'), slider = $('exSlider');
+  let st = null;   // { adj, base, name, name }
+  function preview() {
+    const f = +slider.value / 100; $('exVal').textContent = Math.round(f * 100) + '%';
+    S.adj = scaled(st.adj, f); L.syncUI(); L.draw();
+  }
+  function paint() { const min = +slider.min, max = +slider.max, v = +slider.value; slider.style.setProperty('--s', '0%'); slider.style.setProperty('--e', ((v - min) / (max - min) * 100) + '%'); }
+  function end() { L.lock = false; dock.classList.remove('ex'); $('extract').hidden = true; st = null; L.syncUI(); L.draw(); }
+  function cancel() { if (!st) return; S.adj = st.base; end(); }
+  async function applyIt(save) {
+    if (!st) return;
+    const f = +slider.value / 100, adj = scaled(st.adj, f), base = st.base, name = st.name;
+    S.adj = base; end();
+    L.applyAdjTo(L.cur, adj);
+    if (save) {
+      const r = await L.ask(t('newStyleTitle'), name, null, { noDate: true, nameLabel: 'styleName', placeholder: 'Cinema' });
+      if (r) { await L.styles.add(r.name || name, adj, 'extracted'); L.toast(t('toastStyleSaved')); return; }
+    }
+    L.toast(t('toastExApplied'));
+  }
+  $('exCancel').addEventListener('click', cancel);
+  $('exApply').addEventListener('click', () => applyIt(false));
+  $('exSave').addEventListener('click', () => applyIt(true));
+  slider.addEventListener('input', () => { paint(); if (st) preview(); });
+  (function nudges() {   // fletxes de pas fi (mateix comportament que als ajustos)
+    [['nudgeEL', -1], ['nudgeER', 1]].forEach(([id, d]) => {
+      let t0 = 0, t1 = 0;
+      const fire = () => { slider.value = clamp(+slider.value + d, 0, 150); slider.dispatchEvent(new Event('input')); };
+      const stop = () => { clearTimeout(t0); clearInterval(t1); };
+      $(id).addEventListener('pointerdown', (e) => { e.preventDefault(); fire(); t0 = setTimeout(() => { t1 = setInterval(fire, 55); }, 380); });
+      ['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => $(id).addEventListener(ev, stop));
+    });
+  })();
+
+  /* ---------- Entrada: tria de la foto de referència ---------- */
+  async function fromFile(file) {
+    if (!file || !(file.type || '').startsWith('image/')) { L.toast(t('toastErrOpen')); return; }
+    let res;
+    try { res = await read(file); } catch (e) { console.error(e); L.toast(t('toastExBad')); return; }
+    const adj = toAdjust(res.stats), name = (file.name || '').replace(/\.[^.]+$/, '').slice(0, 40) || t('exName');
+    if (!S.has) {            // sense foto oberta: no hi ha res a previsualitzar -> es desa directament
+      const r = await L.ask(t('newStyleTitle'), name, null, { noDate: true, nameLabel: 'styleName', placeholder: 'Cinema' });
+      if (r && L.styles) { await L.styles.add(r.name || name, adj, 'extracted'); L.toast(t('toastStyleSaved') + ' · ' + describe(adj, res.stats)); }
+      return;
+    }
+    if (L.home) L.home.close(); if (L.library) L.library.close();
+    if (S.mode === 'crop') L.setMode('adjust');
+    st = { adj, base: S.adj, name };
+    $('exRef').src = res.thumb; $('exSub').textContent = describe(adj, res.stats);
+    slider.value = 100; paint();
+    L.lock = true; dock.classList.add('ex'); $('extract').hidden = false;
+    preview();
+  }
+  L.extractFromFile = fromFile;
+  $('refIn').addEventListener('change', () => { const f = $('refIn').files[0]; $('refIn').value = ''; fromFile(f); });
+})();
+
+</script>
+<script>/* js/home.js */
+/* Lumen — pantalla d'inici: continua, accions ràpides, darreres carpetes i estils. */
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const L = window.L, t = L.t, home = $('home');
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const svg = (n) => '<svg class="ic" aria-hidden="true"><use href="#i-' + n + '"/></svg>';
+  const fmtDate = (iso) => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); return m ? m[3] + '/' + m[2] + '/' + m[1].slice(2) : ''; };
+  const nPhotos = (n) => (n === 1 ? t('photoN1') : t('photosN').replace('{n}', n));
+  const recent = () => [...L.folders].sort((a, b) => (b.updated || 0) - (a.updated || 0));
+
+  function render() {
+    const h = new Date().getHours();
+    $('homeHi').textContent = t(h < 6 ? 'hiNight' : h < 13 ? 'hiMorning' : h < 20 ? 'hiAfternoon' : 'hiNight');
+    const act = L.activeFolder() || recent()[0];
+    const c = $('homeCont');
+    if (act && (act.count || L.items.length)) {
+      c.hidden = false; c.dataset.id = act.id;
+      $('homeContLabel').textContent = t('homeContinue');
+      $('homeContName').textContent = act.name;
+      $('homeContMeta').textContent = nPhotos(act.count || L.items.length) + (act.date ? ' · ' + fmtDate(act.date) : '');
+      const img = $('homeCover'); img.hidden = !act.cover; if (act.cover) img.src = act.cover;
+      c.classList.toggle('noimg', !act.cover);
+    } else c.hidden = true;
+    const rec = $('homeRecent'); rec.innerHTML = '';
+    recent().slice(0, 8).forEach((f) => {
+      const b = document.createElement('button'); b.className = 'hf'; b.dataset.id = f.id;
+      b.innerHTML = '<span class="hcv">' + (f.cover ? '<img alt="" src="' + f.cover + '">' : svg('folder')) + '</span><span class="hn">' + esc(f.name) + '</span><span class="hm">' + esc(nPhotos(f.count || 0)) + '</span>';
+      rec.appendChild(b);
+    });
+    $('homeRecentSec').hidden = !L.folders.length;
+    const st = $('homeStyles'); st.innerHTML = '';
+    const mine = L.styles ? L.styles.mine() : [];
+    if (!mine.length) st.innerHTML = '<p class="hempty">' + esc(t('homeNoStyles')) + '</p>';
+    mine.forEach((s) => { const b = document.createElement('button'); b.className = 'chip'; b.dataset.id = s.id; b.innerHTML = svg('wand-sparkles') + '<span>' + esc(s.name) + '</span>'; st.appendChild(b); });
+  }
+  function open() { render(); home.hidden = false; home.classList.remove('in'); void home.offsetWidth; home.classList.add('in'); }
+  function close() { home.hidden = true; }
+  L.home = { open, close };
+
+  $('homeCont').addEventListener('click', async () => {
+    const id = +$('homeCont').dataset.id;
+    if (L.activeFolder() && L.activeFolder().id === id) close(); else { await L.openFolder(id); close(); }
+  });
+  $('homeRecent').addEventListener('click', async (e) => {
+    const b = e.target.closest('.hf'); if (!b) return;
+    const id = +b.dataset.id;
+    if (!(L.activeFolder() && L.activeFolder().id === id)) await L.openFolder(id);
+    close();
+  });
+  $('homeStyles').addEventListener('click', (e) => {
+    const b = e.target.closest('.chip'); if (!b) return;
+    close(); if (L.items.length && L.styles) { L.setMode('styles'); L.styles.choose(b.dataset.id); }
+  });
+  $('homeAll').addEventListener('click', () => L.library.open());
+  $('qaPhotos').addEventListener('click', () => { $('fileIn').click(); });
+  $('qaNew').addEventListener('click', () => L.library.newFolder());
+  $('qaImport').addEventListener('click', () => $('dirIn').click());
+  $('qaStyle').addEventListener('click', () => $('refIn').click());
+  $('libHome').addEventListener('click', () => { L.library.close(); open(); });
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !home.hidden && $('dlg').hidden) close(); });
+  if (L.styles) { const add = L.styles.add; L.styles.add = async (...a) => { const r = await add(...a); if (!home.hidden) render(); return r; }; }
+  L.hooks.folder = ((prev) => () => { prev(); if (!home.hidden) render(); })(L.hooks.folder);
 })();
 
 </script>
