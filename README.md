@@ -16,7 +16,7 @@ Les fotos **mai surten del teu dispositiu**: tot el procés es fa al navegador.
 ## Fitxers
 ```
 index.html               l'app (estructura)
-css/style.css            disseny: paleta, degradats i tipografia
+css/style.css            disseny: negre i blanc trencat, vidre esmerilat, microinteraccions
 fonts/                   Instrument Serif i Hanken Grotesk en local (llicència OFL), perquè funcioni sense connexió
 manifest.webmanifest     perquè Chrome la reconegui com a app
 sw.js                    funcionament sense connexió
@@ -42,7 +42,7 @@ js/app.js, js/crop.js    interfície i eines
 
 ## Actualitzar l'app
 Substitueix els fitxers al repositori i, a `sw.js`, puja el número de `CACHE_VERSION`
-(`lumen-v2` → `lumen-v3`) perquè els dispositius descarreguin la versió nova.
+(`lumen-v3` → `lumen-v4`) perquè els dispositius descarreguin la versió nova.
 
 ## Afegir idiomes
 A `js/i18n.js`, copia el bloc `ca`, canvia la clau (`es`, `en`) i tradueix els textos.

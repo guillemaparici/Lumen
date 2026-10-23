@@ -24,6 +24,8 @@
   L.t = t;
 
   const stage = $('stage'), view = $('view'), ctx = view.getContext('2d');
+  const amb = $('ambient'), actx = amb.getContext('2d');
+  const bar = $('topbar'), dock = $('dock');
   let engine = null;
   try { engine = L.engine = new LumenEngine(); } catch (e) { setTimeout(() => toast(t('toastNoGL')), 300); }
 
@@ -48,16 +50,29 @@
     return S.geo.crop;
   }
   L.contentRect = contentRect;
-  const PAD = 14;
-  function fit(C) { return Math.min((stage.clientWidth - 2 * PAD) / C.w, (stage.clientHeight - 2 * PAD) / C.h); }
+  /* Marges: la foto ocupa tot l'escenari però es col·loca entre la barra i el panell (que suren com a vidre) */
+  const ins = { t: 0, l: 0, r: 0, b: 0 };
+  function measure() {
+    const wide = window.matchMedia('(min-width:900px)').matches;
+    ins.t = bar.offsetTop + bar.offsetHeight + 12;
+    ins.l = ins.r = ins.b = wide ? 20 : 10;
+    if (S.has) {
+      const cs = getComputedStyle(dock);
+      if (wide) ins.r = dock.offsetWidth + (parseFloat(cs.right) || 20) + 20;
+      else ins.b = dock.offsetHeight + (parseFloat(cs.bottom) || 10) + 12;
+    }
+  }
+  const ctr = () => ({ x: ins.l + (stage.clientWidth - ins.l - ins.r) / 2, y: ins.t + (stage.clientHeight - ins.t - ins.b) / 2 });
+  const PAD = 6;
+  function fit(C) { return Math.min((stage.clientWidth - ins.l - ins.r - 2 * PAD) / C.w, (stage.clientHeight - ins.t - ins.b - 2 * PAD) / C.h); }
   L.scale = () => fit(contentRect()) * S.view.zoom;           // px CSS per px de frame
-  L.toScreen = (x, y) => {                                      // coordenades de frame -> estage
-    const C = contentRect(), sc = L.scale();
-    return { x: stage.clientWidth / 2 + (x - C.x - S.view.cx) * sc, y: stage.clientHeight / 2 + (y - C.y - S.view.cy) * sc };
+  L.toScreen = (x, y) => {                                      // coordenades de frame -> escenari
+    const C = contentRect(), sc = L.scale(), c = ctr();
+    return { x: c.x + (x - C.x - S.view.cx) * sc, y: c.y + (y - C.y - S.view.cy) * sc };
   };
   function screenToContent(mx, my) {
-    const sc = L.scale();
-    return { x: S.view.cx + (mx - stage.clientWidth / 2) / sc, y: S.view.cy + (my - stage.clientHeight / 2) / sc };
+    const sc = L.scale(), c = ctr();
+    return { x: S.view.cx + (mx - c.x) / sc, y: S.view.cy + (my - c.y) / sc };
   }
   function clampView() {
     const C = contentRect();
@@ -78,14 +93,27 @@
     const W = Math.round(sw * dpr), H = Math.round(sh * dpr);
     if (view.width !== W || view.height !== H) { view.width = W; view.height = H; }
     view.style.width = sw + 'px'; view.style.height = sh + 'px';
+    measure();
     clampView();
-    const C = contentRect(), k = L.scale() * dpr;
-    const sub = { x: C.x + S.view.cx - W / 2 / k, y: C.y + S.view.cy - H / 2 / k, w: W / k, h: H / k };
+    const C = contentRect(), k = L.scale() * dpr, c = ctr();
+    const sub = { x: C.x + S.view.cx - c.x * dpr / k, y: C.y + S.view.cy - c.y * dpr / k, w: W / k, h: H / k };
     const geo = { rot: S.geo.rot, flipH: S.geo.flipH, flipV: S.geo.flipV, angle: S.geo.angle, crop: sub };
     engine.render(W, H, geo, S.comparing ? null : S.adj, C);
     ctx.clearRect(0, 0, W, H);
     ctx.drawImage(engine.canvas, 0, 0);
+    scheduleAmbient();
     if (L.crop) L.crop.sync();
+  }
+
+  /* ---------- Halo ambiental: miniatura de la foto, ampliada i difuminada per CSS ---------- */
+  let ambTimer = 0;
+  function scheduleAmbient() { if (!ambTimer) ambTimer = setTimeout(() => { ambTimer = 0; paintAmbient(); }, 220); }
+  function paintAmbient() {
+    if (!S.has || !view.width) return;
+    const w = 28, h = Math.max(2, Math.round(w * view.height / view.width));
+    if (amb.width !== w || amb.height !== h) { amb.width = w; amb.height = h; }
+    actx.clearRect(0, 0, w, h);
+    actx.drawImage(view, 0, 0, w, h);
   }
 
   /* ---------- Historial ---------- */
@@ -165,6 +193,8 @@
     if (S.mode === 'crop' && L.crop) L.crop.leave(true);
     S.mode = m;
     $('tabAdj').classList.toggle('on', m === 'adjust'); $('tabCrop').classList.toggle('on', m === 'crop');
+    $('tabAdj').setAttribute('aria-selected', m === 'adjust'); $('tabCrop').setAttribute('aria-selected', m === 'crop');
+    $('tools').dataset.active = m;
     $('panelAdj').hidden = m !== 'adjust'; $('panelCrop').hidden = m !== 'crop';
     if (m === 'crop' && L.crop) L.crop.enter();
     L.resetView(); L.draw();
@@ -181,8 +211,9 @@
     const anchor = screenToContent(mx, my);
     S.view.zoom = clamp(newZoom, 1, 10);
     const sc = L.scale();
-    S.view.cx = anchor.x - (mx - stage.clientWidth / 2) / sc;
-    S.view.cy = anchor.y - (my - stage.clientHeight / 2) / sc;
+    const c = ctr();
+    S.view.cx = anchor.x - (mx - c.x) / sc;
+    S.view.cy = anchor.y - (my - c.y) / sc;
     clampView(); L.draw(); flash('×' + S.view.zoom.toFixed(1));
   }
   stage.addEventListener('pointerdown', (e) => {
@@ -205,8 +236,9 @@
       const d = Math.hypot(a.lx - b.lx, a.ly - b.ly), mx = (a.lx + b.lx) / 2 - r.left, my = (a.ly + b.ly) / 2 - r.top;
       S.view.zoom = clamp(gesture.z0 * d / gesture.d0, 1, 10);
       const sc = L.scale();
-      S.view.cx = gesture.anchor.x - (mx - stage.clientWidth / 2) / sc;
-      S.view.cy = gesture.anchor.y - (my - stage.clientHeight / 2) / sc;
+      const c = ctr();
+      S.view.cx = gesture.anchor.x - (mx - c.x) / sc;
+      S.view.cy = gesture.anchor.y - (my - c.y) / sc;
       clampView(); L.draw();
     } else if (ptrs.size === 1 && S.view.zoom > 1.001) {
       const sc = L.scale();
@@ -265,13 +297,14 @@
       if (bmp.close) bmp.close();
       if (S.mode === 'crop' && L.crop) L.crop.leave(false);
       S.mode = 'adjust';
-      $('tabAdj').classList.add('on'); $('tabCrop').classList.remove('on');
+      $('tabAdj').classList.add('on'); $('tabCrop').classList.remove('on'); $('tools').dataset.active = 'adjust';
       $('panelAdj').hidden = false; $('panelCrop').hidden = true;
       S.srcW = info.w; S.srcH = info.h; S.has = true;
       S.name = (file.name || 'foto').replace(/\.[^.]+$/, '') || 'foto';
       S.adj = zero(); S.history = []; S.future = []; S.draft = null; S.ratioId = 'free';
       S.geo = { rot: 0, flipH: false, flipV: false, angle: 0, crop: { x: 0, y: 0, w: info.w, h: info.h } };
       $('empty').hidden = true;
+      $('app').classList.remove('noimg');
       ['btnExport', 'btnCompare'].forEach((id) => ($(id).disabled = false));
       updateBtns(); syncUI(); L.resetView(); L.draw();
       if (info.downscaled) toast(t('toastBig'));
@@ -385,6 +418,7 @@
   I18N.apply();
   select('brightness');
   document.querySelectorAll('input[type=range]').forEach(paint);
-  new ResizeObserver(() => L.draw()).observe(stage);
+  const ro = new ResizeObserver(() => L.draw());
+  [stage, dock, bar].forEach((el) => ro.observe(el));
   window.addEventListener('orientationchange', () => setTimeout(L.draw, 200));
 })();

@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <title>Lumen — Editor de fotos</title>
 <meta name="description" content="Editor de fotos personal: ajustos, retall i exportació. Funciona sense connexió.">
-<meta name="theme-color" content="#090807">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="color-scheme" content="dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -18,35 +19,61 @@
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<div id="app">
-  <header id="topbar">
-    <button class="ibtn" id="btnOpen" aria-label="Obrir foto" title="Obrir foto (O)"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></button>
-    <div class="brand"><i></i>Lumen</div>
-    <button class="ibtn" id="btnCompare" aria-label="Mantén premut per veure l'original" title="Mantén premut: original (C)" disabled><svg viewBox="0 0 24 24"><path d="M12 3v18"/><rect x="3" y="5" width="18" height="14" rx="2"/></svg></button>
-    <button class="ibtn" id="btnUndo" aria-label="Desfer" title="Desfer (Ctrl+Z)" disabled><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
-    <button class="ibtn" id="btnRedo" aria-label="Refer" title="Refer (Ctrl+Maj+Z)" disabled><svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button>
-    <button class="pill" id="btnExport" disabled><svg viewBox="0 0 24 24" style="width:17px;height:17px"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg><span data-i18n="export">Exporta</span></button>
-  </header>
 
+<!-- Iconos Lucide (ISC) incrustats: no cal connexió ni CDN -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-folder-open" viewBox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2" /></symbol>
+  <symbol id="i-columns-2" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2" /> <path d="M12 3v18" /></symbol>
+  <symbol id="i-undo-2" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5" /> <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11" /></symbol>
+  <symbol id="i-redo-2" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5" /> <path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5A5.5 5.5 0 0 0 9.5 20H13" /></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 15V3" /> <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /> <path d="m7 10 5 5 5-5" /></symbol>
+  <symbol id="i-sliders-horizontal" viewBox="0 0 24 24"><path d="M10 5H3" /> <path d="M12 19H3" /> <path d="M14 3v4" /> <path d="M16 17v4" /> <path d="M21 12h-9" /> <path d="M21 19h-5" /> <path d="M21 5h-7" /> <path d="M8 10v4" /> <path d="M8 12H3" /></symbol>
+  <symbol id="i-crop" viewBox="0 0 24 24"><path d="M6 2v14a2 2 0 0 0 2 2h14" /> <path d="M18 22V8a2 2 0 0 0-2-2H2" /></symbol>
+  <symbol id="i-rotate-ccw" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /> <path d="M3 3v5h5" /></symbol>
+  <symbol id="i-rotate-cw" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" /> <path d="M21 3v5h-5" /></symbol>
+  <symbol id="i-flip-horizontal-2" viewBox="0 0 24 24"><path d="M10 12H8" /> <path d="M16 12h-2" /> <path d="M22 12h-2" /> <path d="M4 12H2" /> <path d="M7.298 20.288A1 1 0 008 22h8a1 1 0 00.703-1.712l-3.991-3.99a1 1 0 00-1.424-.001z" /> <path d="M7.298 3.712A1 1 0 018 2h8a1 1 0 01.703 1.712l-3.991 3.99a1 1 0 01-1.424.001z" /></symbol>
+  <symbol id="i-flip-vertical-2" viewBox="0 0 24 24"><path d="M12 14v2" /> <path d="M12 20v2" /> <path d="M12 2v2" /> <path d="M12 8v2" /> <path d="M20.288 16.703A1 1 0 0022 16V8a1 1 0 00-1.712-.703l-3.99 3.991a1 1 0 00-.001 1.424z" /> <path d="M3.712 16.703A1 1 0 012 16V8a1 1 0 011.712-.703l3.99 3.991a1 1 0 01.001 1.424z" /></symbol>
+  <symbol id="i-image-plus" viewBox="0 0 24 24"><path d="M16 5h6" /> <path d="M19 2v6" /> <path d="M21 11.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7.5" /> <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /> <circle cx="9" cy="9" r="2" /></symbol>
+</svg>
+
+<!-- L'app: la foto ocupa tota la pantalla i la barra i el panell hi suren per sobre com a vidre -->
+<div id="app" class="noimg">
+
+  <!-- ESCENARI: halo ambiental + foto + capa de retall + pantalla inicial -->
   <main id="stage" data-drop="Deixa la foto aquí">
+    <canvas id="ambient" aria-hidden="true"></canvas>
     <canvas id="view"></canvas>
     <div id="cropLayer" hidden></div>
     <div id="badge"></div>
+
     <div id="empty">
       <img class="logo" src="icons/icon-192.png" alt="">
       <h1><span data-i18n="emptyTitle1">Dona</span> <em data-i18n="emptyTitle2">llum a les teves fotos</em></h1>
       <p data-i18n="emptyText">Obre una foto per començar. Tot es queda al teu dispositiu.</p>
-      <button class="pill" id="btnOpen2"><span data-i18n="openPhoto">Obre una foto</span></button>
+      <button class="pill big" id="btnOpen2"><svg class="ic" aria-hidden="true"><use href="#i-image-plus"/></svg><span data-i18n="openPhoto">Obre una foto</span></button>
     </div>
     <div id="loading" hidden><span data-i18n="loading">Carregant…</span></div>
   </main>
 
+  <!-- BARRA SUPERIOR (vidre) -->
+  <header id="topbar">
+    <button class="ibtn" id="btnOpen" data-i18n-title="tipOpen" title="Obre una foto (O)"><svg class="ic" aria-hidden="true"><use href="#i-folder-open"/></svg></button>
+    <div class="brand"><i></i><span>Lumen</span></div>
+    <button class="ibtn" id="btnCompare" data-i18n-title="tipCompare" title="Mantén premut per veure l'original (C)" disabled><svg class="ic" aria-hidden="true"><use href="#i-columns-2"/></svg></button>
+    <button class="ibtn" id="btnUndo" data-i18n-title="tipUndo" title="Desfés (Ctrl+Z)" disabled><svg class="ic" aria-hidden="true"><use href="#i-undo-2"/></svg></button>
+    <button class="ibtn" id="btnRedo" data-i18n-title="tipRedo" title="Refés (Ctrl+Maj+Z)" disabled><svg class="ic" aria-hidden="true"><use href="#i-redo-2"/></svg></button>
+    <button class="pill" id="btnExport" disabled><svg class="ic" aria-hidden="true"><use href="#i-download"/></svg><span data-i18n="export">Exporta</span></button>
+  </header>
+
+  <!-- PANELL D'EINES (vidre) -->
   <section id="dock" aria-label="Eines">
-    <div id="tools" role="tablist">
-      <button id="tabAdj" class="on" role="tab"><svg viewBox="0 0 24 24"><path d="M4 6h10"/><path d="M18 6h2"/><circle cx="16" cy="6" r="2"/><path d="M4 12h2"/><path d="M10 12h10"/><circle cx="8" cy="12" r="2"/><path d="M4 18h12"/><path d="M20 18h0"/><circle cx="18" cy="18" r="2"/></svg><span data-i18n="tabAdjust">Ajustos</span></button>
-      <button id="tabCrop" role="tab"><svg viewBox="0 0 24 24"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg><span data-i18n="tabCrop">Retall</span></button>
+    <div id="tools" role="tablist" data-active="adjust">
+      <span class="tab-ind" aria-hidden="true"></span>
+      <button id="tabAdj" class="on" role="tab" aria-selected="true"><svg class="ic" aria-hidden="true"><use href="#i-sliders-horizontal"/></svg><span data-i18n="tabAdjust">Ajustos</span></button>
+      <button id="tabCrop" role="tab" aria-selected="false"><svg class="ic" aria-hidden="true"><use href="#i-crop"/></svg><span data-i18n="tabCrop">Retall</span></button>
     </div>
 
+    <!-- Pestanya: ajustos -->
     <div id="panelAdj" class="panel">
       <div class="chips" id="adjChips"></div>
       <div class="sliderRow">
@@ -61,18 +88,19 @@
       </div>
     </div>
 
+    <!-- Pestanya: retall -->
     <div id="panelCrop" class="panel" hidden>
       <div class="chips" id="ratioChips"></div>
       <div class="sliderRow">
         <span class="name" data-i18n="straighten">Endreça</span>
-        <input type="range" id="angleSlider" min="-45" max="45" step="0.1" value="0" aria-label="Endreçar horitzó">
+        <input type="range" id="angleSlider" min="-45" max="45" step="0.1" value="0" aria-label="Endreçar l'horitzó">
         <span class="val" id="angleVal">0°</span>
       </div>
-      <div class="row">
-        <button class="btn" id="btnRotL"><svg viewBox="0 0 24 24" style="width:17px;height:17px"><path d="M3 8V3m0 5h5"/><path d="M3.5 8A9 9 0 1 1 3 13"/></svg><span data-i18n="rotL">90°</span></button>
-        <button class="btn" id="btnRotR"><svg viewBox="0 0 24 24" style="width:17px;height:17px"><path d="M21 8V3m0 5h-5"/><path d="M20.5 8A9 9 0 1 0 21 13"/></svg><span data-i18n="rotR">90°</span></button>
-        <button class="btn" id="btnFlipH" data-i18n="flipH">Voltea ↔</button>
-        <button class="btn" id="btnFlipV" data-i18n="flipV">Voltea ↕</button>
+      <div class="row tight">
+        <button class="ibtn sq" id="btnRotL" data-i18n-title="tipRotL" title="Gira a l'esquerra"><svg class="ic" aria-hidden="true"><use href="#i-rotate-ccw"/></svg></button>
+        <button class="ibtn sq" id="btnRotR" data-i18n-title="tipRotR" title="Gira a la dreta"><svg class="ic" aria-hidden="true"><use href="#i-rotate-cw"/></svg></button>
+        <button class="ibtn sq" id="btnFlipH" data-i18n-title="tipFlipH" title="Voltea horitzontalment"><svg class="ic" aria-hidden="true"><use href="#i-flip-horizontal-2"/></svg></button>
+        <button class="ibtn sq" id="btnFlipV" data-i18n-title="tipFlipV" title="Voltea verticalment"><svg class="ic" aria-hidden="true"><use href="#i-flip-vertical-2"/></svg></button>
         <span class="grow"></span>
         <button class="btn ghost" id="btnCropReset" data-i18n="resetCrop">Restableix</button>
         <button class="btn primary" id="btnCropApply" data-i18n="apply">Aplica</button>
@@ -81,6 +109,7 @@
   </section>
 </div>
 
+<!-- FULL D'EXPORTACIÓ (vidre) -->
 <div id="sheet" hidden>
   <div class="card" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
     <h2 id="sheetTitle" data-i18n="exportTitle">Exporta la foto</h2>
@@ -91,7 +120,7 @@
     <div class="field"><label data-i18n="size">Mida</label>
       <select id="sizeSel"></select></div>
     <p class="hint" id="exportInfo"></p>
-    <div class="row" style="padding:14px 0 0">
+    <div class="row sheetActions">
       <button class="btn ghost" id="btnExpCancel" data-i18n="cancel">Cancel·la</button>
       <span class="grow"></span>
       <button class="btn primary" id="btnExpGo" data-i18n="save">Desa</button>

@@ -12,6 +12,9 @@
       straighten: 'Endreça', rotL: '90°', rotR: '90°', flipH: 'Voltea ↔', flipV: 'Voltea ↕',
       resetCrop: 'Restableix', apply: 'Aplica',
       exportTitle: 'Exporta la foto', format: 'Format', quality: 'Qualitat', size: 'Mida', cancel: 'Cancel·la', save: 'Desa',
+      // consells (tooltips)
+      tipOpen: 'Obre una foto (O)', tipCompare: 'Mantén premut per veure l\'original (C)', tipUndo: 'Desfés (Ctrl+Z)', tipRedo: 'Refés (Ctrl+Maj+Z)',
+      tipRotL: 'Gira a l\'esquerra', tipRotR: 'Gira a la dreta', tipFlipH: 'Voltea horitzontalment', tipFlipV: 'Voltea verticalment',
       // ajustos
       adj_brightness: 'Brillantor', adj_contrast: 'Contrast', adj_saturation: 'Saturació', adj_ambience: 'Ambient',
       adj_highlights: 'Llums', adj_shadows: 'Ombres', adj_warmth: 'Temperatura', adj_tint: 'Tinta',
@@ -36,6 +39,9 @@
     t(key) { return (DICT[lang] && DICT[lang][key]) || DICT.ca[key] || key; },
     apply(root) {
       (root || document).querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = I18N.t(el.dataset.i18n); });
+      (root || document).querySelectorAll('[data-i18n-title]').forEach((el) => {
+        const v = I18N.t(el.dataset.i18nTitle); el.title = v; el.setAttribute('aria-label', v);
+      });
       document.documentElement.lang = lang;
     }
   };
