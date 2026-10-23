@@ -541,6 +541,28 @@ select option{background:#1b1b1d;color:var(--text)}
 .th .badx .ic{width:20px;height:20px}
 @media (max-width:430px){#topbar .ibtn{width:35px}#topbar .pill{padding:0 14px;gap:6px}#topbar{gap:0;padding:0 6px 0 4px}}
 
+/* ===== 18. CORBA DE TONS ===== */
+#curve{position:fixed;left:0;right:0;bottom:0;z-index:16;display:flex;justify-content:center;pointer-events:none}
+#curve[hidden]{display:none}
+.cvCard{pointer-events:auto;width:min(440px,100%);padding:14px 16px calc(14px + var(--safe-b));border-radius:28px 28px 0 0;
+  background:linear-gradient(180deg,rgba(40,40,43,.9) 0%,rgba(14,14,16,.97) 100%);box-shadow:0 0 0 1px rgba(245,245,247,.1) inset,0 -20px 50px rgba(0,0,0,.55);
+  -webkit-backdrop-filter:blur(26px);backdrop-filter:blur(26px);animation:sheetUp .5s var(--ease) both}
+.cvHead{display:flex;align-items:center;gap:10px}
+.cvHead h2{margin:0;font-family:var(--serif);font-style:italic;font-weight:400;font-size:28px;line-height:1}
+.cvCh{flex:1;max-width:210px;margin-left:auto}
+.cvDone{height:36px;padding:0 16px}
+.cvBox{margin:10px auto 6px;width:min(100%,270px)}
+#cvCanvas{display:block;width:100%;aspect-ratio:1;touch-action:none;cursor:crosshair}
+.cvPresets{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0 8px}
+.cvPresets::-webkit-scrollbar{display:none}
+.chip.sm{padding:6px 12px;font-size:12.5px}
+.cvRow{display:flex;align-items:center;gap:10px}
+.cvNudge{display:flex;gap:4px}
+.cvNudge .nudge{width:34px;height:34px}
+.cvVal{flex:1;text-align:center;color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.curveChip .ic{width:15px;height:15px;margin-right:6px;vertical-align:-2px}
+body.cvOpen #dock{visibility:hidden}
+
 </style>
 </head>
 <body>
@@ -548,6 +570,9 @@ select option{background:#1b1b1d;color:var(--text)}
 <!-- Iconos Lucide (ISC) incrustats: no cal connexió ni CDN -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <symbol id="i-logo" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M7.6 14.6a5 5 0 0 1 6.8-6.8"/><circle cx="15.6" cy="8.4" r=".9" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-chevron-up" viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"/></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-spline" viewBox="0 0 24 24"><circle cx="19" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><path d="M5 17A12 12 0 0 1 17 5"/></symbol>
   <symbol id="i-house" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
 <symbol id="i-folder-open" viewBox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2" /></symbol>
   <symbol id="i-columns-2" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2" /> <path d="M12 3v18" /></symbol>
@@ -728,6 +753,31 @@ select option{background:#1b1b1d;color:var(--text)}
 </div>
 
 <!-- BIBLIOTECA DE CARPETES (vidre a pantalla completa) -->
+<!-- Corba de tons -->
+<div id="curve" hidden>
+  <div class="cvCard">
+    <header class="cvHead">
+      <h2 data-i18n="cvTitle">Corba</h2>
+      <div class="seg cvCh" id="cvCh" role="tablist">
+        <button data-ch="l" class="on" data-i18n="cvL">Llum</button><button data-ch="r">R</button><button data-ch="g">G</button><button data-ch="b">B</button>
+      </div>
+      <button class="btn primary cvDone" id="cvDone" data-i18n="cvDone">Fet</button>
+    </header>
+    <div class="cvBox"><canvas id="cvCanvas" aria-label="Corba de tons"></canvas></div>
+    <div class="cvPresets" id="cvPresets"></div>
+    <div class="cvRow">
+      <div class="cvNudge">
+        <button class="nudge" data-d="-1,0" aria-label="←"><svg class="ic"><use href="#i-chevron-left"/></svg></button>
+        <button class="nudge" data-d="1,0" aria-label="→"><svg class="ic"><use href="#i-chevron-right"/></svg></button>
+        <button class="nudge" data-d="0,-1" aria-label="↓"><svg class="ic"><use href="#i-chevron-down"/></svg></button>
+        <button class="nudge" data-d="0,1" aria-label="↑"><svg class="ic"><use href="#i-chevron-up"/></svg></button>
+      </div>
+      <span class="cvVal" id="cvVal"></span>
+      <button class="btn ghost" id="cvReset" data-i18n="cvReset">Restableix</button>
+    </div>
+  </div>
+</div>
+
 <div id="library" hidden>
   <header class="libTop">
     <button class="ibtn" id="libClose" data-i18n-title="close" aria-label="Tanca"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
@@ -809,6 +859,8 @@ select option{background:#1b1b1d;color:var(--text)}
       qaPhotos: 'Afegeix fotos', qaNew: 'Nova carpeta', qaImport: 'Importa carpeta', qaStyle: 'Extreu estil',
       homeRecent: 'Darreres carpetes', homeAll: 'Veure-les totes', homeStyles: 'Els meus estils', homeNoStyles: 'Encara no tens estils desats. Extreu-ne un d\'una foto o desa\'n un des d\'Estils.',
       tipHome: 'Inici', homeEnter: 'Entra a l\'editor',
+      cvTitle: 'Corba', cvL: 'Llum', cvDone: 'Fet', cvReset: 'Restableix', adj_curve: 'Corba',
+      cvSoft: 'S suau', cvStrong: 'S marcada', cvFade: 'Fade', cvLift: 'Aixeca ombres', cvBright: 'Més llum', cvHint: 'Toca per afegir un punt · doble toc per treure\'l',
       photoOf: 'Foto {a} de {b}', onePhoto: 'Una sola foto. Afegeix-ne més per treballar en lot.',
       addPhotos: 'Afegeix fotos', removePhoto: 'Treu aquesta foto del lot',
       copyAdj: 'Copia ajustos', pasteAdj: 'Enganxa ajustos', pasteSel: 'Enganxa a {n}', applyAll: 'Aplica a totes',
@@ -1080,6 +1132,59 @@ select option{background:#1b1b1d;color:var(--text)}
 })();
 
 </script>
+<script>/* js/curvemath.js */
+/* Lumen — matemàtica de la corba de tons: spline cúbica monòtona (Fritsch–Carlson), sense oscil·lacions.
+   Una corba = { l:[[x,y],...], r:[...], g:[...], b:[...] } amb x,y a 0..1; cada canal és opcional (identitat = [[0,0],[1,1]]). */
+(function () {
+  'use strict';
+  const ID = [[0, 0], [1, 1]];
+  const clean = (pts) => {
+    if (!Array.isArray(pts) || pts.length < 2) return ID.map((p) => p.slice());
+    let a = pts.map((p) => [Math.min(1, Math.max(0, +p[0] || 0)), Math.min(1, Math.max(0, +p[1] || 0))]).sort((p, q) => p[0] - q[0]);
+    a[0][0] = 0; a[a.length - 1][0] = 1;
+    const out = [a[0]]; for (let i = 1; i < a.length; i++) if (a[i][0] - out[out.length - 1][0] > 0.004) out.push(a[i]);
+    if (out[out.length - 1][0] < 1) out.push([1, a[a.length - 1][1]]); else out[out.length - 1][0] = 1;
+    return out.length >= 2 ? out : ID.map((p) => p.slice());
+  };
+  function sample(pts, n) {
+    const p = clean(pts), m = p.length, xs = p.map((q) => q[0]), ys = p.map((q) => q[1]);
+    const d = [], t = new Array(m).fill(0);
+    for (let i = 0; i < m - 1; i++) d.push((ys[i + 1] - ys[i]) / (xs[i + 1] - xs[i]));
+    t[0] = d[0]; t[m - 1] = d[m - 2];
+    for (let i = 1; i < m - 1; i++) t[i] = d[i - 1] * d[i] <= 0 ? 0 : (d[i - 1] + d[i]) / 2;
+    for (let i = 0; i < m - 1; i++) {
+      if (d[i] === 0) { t[i] = 0; t[i + 1] = 0; continue; }
+      const a = t[i] / d[i], b = t[i + 1] / d[i], s = a * a + b * b;
+      if (s > 9) { const k = 3 / Math.sqrt(s); t[i] = k * a * d[i]; t[i + 1] = k * b * d[i]; }
+    }
+    const out = new Float32Array(n); let j = 0;
+    for (let k = 0; k < n; k++) {
+      const x = k / (n - 1); while (j < m - 2 && x > xs[j + 1]) j++;
+      const h = xs[j + 1] - xs[j], u = (x - xs[j]) / h, u2 = u * u, u3 = u2 * u;
+      out[k] = Math.min(1, Math.max(0, (2 * u3 - 3 * u2 + 1) * ys[j] + (u3 - 2 * u2 + u) * h * t[j] + (-2 * u3 + 3 * u2) * ys[j + 1] + (u3 - u2) * h * t[j + 1]));
+    }
+    return out;
+  }
+  const isId = (pts) => !pts || (pts.length === 2 && Math.abs(pts[0][0]) < 1e-6 && Math.abs(pts[0][1]) < 1e-6 && Math.abs(pts[1][0] - 1) < 1e-6 && Math.abs(pts[1][1] - 1) < 1e-6);
+  window.LumenCurve = {
+    ID, clean, sample,
+    isIdentity: (c) => !c || ['l', 'r', 'g', 'b'].every((k) => isId(c[k])),
+    /** Taula RGBA 256x1: r,g,b = corbes de color; a = corba de lluminositat */
+    lut(c) {
+      const L = sample(c.l, 256), R = sample(c.r, 256), G = sample(c.g, 256), B = sample(c.b, 256), o = new Float32Array(256 * 4);
+      for (let i = 0; i < 256; i++) { o[i * 4] = R[i]; o[i * 4 + 1] = G[i]; o[i * 4 + 2] = B[i]; o[i * 4 + 3] = L[i]; }
+      return o;
+    },
+    /** Valida una corba carregada (p. ex. d'un estil) */
+    sanitize(c) {
+      if (!c || typeof c !== 'object') return null;
+      const o = {}; ['l', 'r', 'g', 'b'].forEach((k) => { if (c[k] && !isId(c[k])) o[k] = clean(c[k]); });
+      return Object.keys(o).length ? o : null;
+    }
+  };
+})();
+
+</script>
 <script>/* js/engine.js */
 /* Lumen — motor de render (WebGL2)
    Un sol "fragment shader" fa geometria (rotació 90°, voltejat, endreçar, retall) i ajustos de color.
@@ -1107,6 +1212,8 @@ select option{background:#1b1b1d;color:var(--text)}
   uniform vec2 u_flip;
   uniform float u_ts;    // mida de la textura / mida lògica (la vista prèvia és més petita)
   uniform float u_any;   // 1 si hi ha algun ajust actiu
+  uniform float u_cv;    // 1 si hi ha corba de tons
+  uniform sampler2D u_lut; // 256x1: r,g,b = corbes de color, a = corba de lluminositat
   uniform vec4 u_a0; // brillantor, contrast, saturació, ambient
   uniform vec4 u_a1; // llums, ombres, temperatura, tinta
   uniform vec2 u_a2; // nitidesa, vinyeta
@@ -1139,6 +1246,26 @@ select option{background:#1b1b1d;color:var(--text)}
     return (blur4(f, rad)*4.0 + fetchLod(f+vec2(q,q),l)+fetchLod(f+vec2(q,-q),l)+fetchLod(f+vec2(-q,q),l)+fetchLod(f+vec2(-q,-q),l))*0.125;
   }
   float lum(vec3 c){ return dot(c, W); }
+  // Oklab (Björn Ottosson): espai perceptualment uniforme per a claredat i croma
+  vec3 toLab(vec3 c){
+    float l = pow(max(0.4122214708*c.r + 0.5363325363*c.g + 0.0514459929*c.b, 0.0), 0.33333333);
+    float m = pow(max(0.2119034982*c.r + 0.6806995451*c.g + 0.1073969566*c.b, 0.0), 0.33333333);
+    float s = pow(max(0.0883024619*c.r + 0.2817188376*c.g + 0.6299787005*c.b, 0.0), 0.33333333);
+    return vec3(0.2104542553*l + 0.7936177850*m - 0.0040720468*s,
+                1.9779984951*l - 2.4285922050*m + 0.4505937099*s,
+                0.0259040371*l + 0.7827717662*m - 0.8086757660*s);
+  }
+  vec3 fromLab(vec3 q){
+    float l = q.x + 0.3963377774*q.y + 0.2158037573*q.z;
+    float m = q.x - 0.1055613458*q.y - 0.0638541728*q.z;
+    float s = q.x - 0.0894841775*q.y - 1.2914855480*q.z;
+    l = l*l*l; m = m*m*m; s = s*s*s;
+    return vec3( 4.0767416621*l - 3.3077115913*m + 0.2309699292*s,
+                -1.2684380046*l + 2.6097574011*m - 0.3413193965*s,
+                -0.0041960863*l - 0.7034186147*m + 1.7076147010*s);
+  }
+  float okL(vec3 c){ return toLab(c).x; }
+  vec4 lutAt(float x){ return texture(u_lut, vec2(clamp(x,0.0,1.0)*(255.0/256.0) + 0.5/256.0, 0.5)); }
   vec3 enc(vec3 x){ x = max(x, 0.0); return mix(x*12.92, 1.055*pow(x, vec3(1.0/2.4)) - 0.055, step(0.0031308, x)); }
   vec3 dec(vec3 x){ x = max(x, 0.0); return mix(x/12.92, pow((x+0.055)/1.055, vec3(2.4)), step(0.04045, x)); }
   float pe(float L){ return pow(max(L, 1e-5), 0.4545); }
@@ -1176,42 +1303,52 @@ select option{background:#1b1b1d;color:var(--text)}
           c = mix(c, c*(Ln/max(L,1e-4)), clamp(bri*3.0, 0.0, 1.0));
         }
       }
-      // 3) Ombres i llums amb màscara local (barreja de píxel i entorn) => sense halos grisos
+      // 3) Ombres i llums: màscara multi-escala sobre la claredat perceptual (Oklab) => sense halos ni manxes grises
       if(sh != 0.0 || hi != 0.0){
-        float Lb = lum(blur4(f0, longSide*0.018));
-        float m = mix(pe(lum(c)), pe(Lb*exp2(bri*1.5)), 0.5);
-        float wS = 1.0 - smoothstep(0.04, 0.62, m);
-        float wH = smoothstep(0.38, 0.96, m);
-        c *= exp2(sh*1.35*wS + hi*0.95*wH);
+        float g = exp2(bri*1.5);
+        float l1 = okL(blur4(f0, longSide*0.012)*g), l2 = okL(blur4(f0, longSide*0.045)*g);
+        float m = mix(okL(c), mix(l1, l2, 0.5), 0.6);
+        float wS = 1.0 - smoothstep(0.08, 0.62, m);
+        float wH = smoothstep(0.42, 0.97, m);
+        c *= exp2(sh*1.25*wS + hi*0.95*wH);
       }
 
-      // --- espai perceptual ---
-      vec3 p = enc(c);
-      // 4) Contrast: corba suau al voltant del gris mitjà (50% per canal + 50% conservant el to)
+      // --- espai Oklab: claredat (L) i color (a,b) separats => el to no es desplaça en tocar contrast o saturació ---
+      vec3 lab = toLab(max(c, 0.0));
+      // 4) Contrast: corba en S suau sobre la claredat al voltant del gris mitjà, sense retalls
       if(con != 0.0){
-        float a = exp2(con*0.95);
-        vec3 over = p - clamp(p, 0.0, 1.0);
-        vec3 pc = vec3(gainC(p.r,a), gainC(p.g,a), gainC(p.b,a));
-        float Lp = max(dot(p, W), 1e-4);
-        vec3 pl = p * (gainC(Lp, a)/Lp);
-        p = mix(pc, pl, 0.5) + over;
+        float a = exp2(con*0.9), pv = 0.56, x = clamp(lab.x, 0.0, 1.0);
+        float y = x < pv ? pv*pow(x/pv, a) : 1.0 - (1.0-pv)*pow((1.0-x)/(1.0-pv), a);
+        lab.yz *= 1.0 + 0.35*(y - x);             // el color acompanya la claredat (com un contrast fotogràfic)
+        lab.x = y;
       }
-      // 5) Ambient: contrast local multi-escala només a la luminància + una mica de color
+      // 5) Ambient: contrast local multi-escala només a la claredat
       if(amb != 0.0){
-        float Lp = max(dot(p, W), 1e-4);
-        float b1 = pe(lum(blur4(f0, longSide*0.010)));
-        float b2 = pe(lum(blur4(f0, longSide*0.035)));
-        float d = Lp - mix(b1, b2, 0.6);
-        float mid = 1.0 - 0.85*pow(abs(2.0*Lp - 1.0), 3.0);
-        p *= max(Lp + d*amb*1.9*mid, 0.0) / Lp;
-        sat += amb*0.28;
+        float b1 = okL(blur4(f0, longSide*0.010)), b2 = okL(blur4(f0, longSide*0.035));
+        float d = lab.x - mix(b1, b2, 0.6);
+        float mid = 1.0 - 0.8*pow(abs(2.0*lab.x - 1.0), 3.0);
+        lab.x = max(lab.x + d*amb*1.1*mid, 0.0);
+        sat += amb*0.2;
       }
-      // 6) Saturació amb vibrància: els colors ja saturats es protegeixen d'una sobresaturació
+      // 6) Saturació amb vibrància sobre el croma d'Oklab: els colors ja intensos es protegeixen
       if(sat != 0.0){
-        float Lg = dot(p, W);
-        float chroma = max(max(p.r,p.g),p.b) - min(min(p.r,p.g),p.b);
-        float k = sat > 0.0 ? sat*(1.0 - 0.6*smoothstep(0.15, 0.75, chroma)) : sat;
-        p = max(vec3(Lg) + (p - vec3(Lg))*(1.0 + k), 0.0);
+        float C = length(lab.yz);
+        float k = sat > 0.0 ? sat*(1.0 - 0.65*smoothstep(0.07, 0.26, C)) : sat;
+        lab.yz *= max(1.0 + k, 0.0);
+      }
+      vec3 rgb = fromLab(lab);
+      // gamma fora de gamut: es redueix el croma en lloc de retallar canals (evita colors bruts)
+      float mn = min(rgb.r, min(rgb.g, rgb.b)), Y = max(lum(rgb), 1e-5);
+      if(mn < 0.0) rgb = vec3(Y) + (rgb - vec3(Y))*(Y/(Y - mn));
+      vec3 p = enc(rgb);
+      // 6b) Corba de tons (editable): lluminositat (barreja de canal i conservant el color) + corbes R/G/B
+      if(u_cv > 0.5){
+        p = clamp(p, 0.0, 1.0);
+        vec3 pc = vec3(lutAt(p.r).a, lutAt(p.g).a, lutAt(p.b).a);
+        float Lq = max(dot(p, W), 1e-4);
+        p = mix(pc, p*(lutAt(Lq).a/Lq), 0.4);
+        p = clamp(p, 0.0, 1.0);
+        p = vec3(lutAt(p.r).r, lutAt(p.g).g, lutAt(p.b).b);
       }
       // 7) Nitidesa: màscara d'enfocament només a la luminància, amb nucli anti-soroll i límit de halos
       if(sharp > 0.0){
@@ -1263,7 +1400,7 @@ select option{background:#1b1b1d;color:var(--text)}
       this.prog = prog;
       gl.useProgram(prog);
       this.u = {};
-      ['u_tex', 'u_frame', 'u_crop', 'u_full', 'u_angle', 'u_rot', 'u_flip', 'u_a0', 'u_a1', 'u_a2', 'u_ts', 'u_any'].forEach((n) => (this.u[n] = gl.getUniformLocation(prog, n)));
+      ['u_lut', 'u_cv', 'u_tex', 'u_frame', 'u_crop', 'u_full', 'u_angle', 'u_rot', 'u_flip', 'u_a0', 'u_a1', 'u_a2', 'u_ts', 'u_any'].forEach((n) => (this.u[n] = gl.getUniformLocation(prog, n)));
       const buf = gl.createBuffer();
       gl.bindBuffer(gl.ARRAY_BUFFER, buf);
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
@@ -1272,6 +1409,13 @@ select option{background:#1b1b1d;color:var(--text)}
       gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
       this.texs = new Map();            // clau -> { tex, w, h (lògics), tw, th (textura) }
       this.tex = null; this.cur = null;
+      this.lutTex = gl.createTexture(); this.lutKey = '';
+      gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, this.lutTex);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, 256, 1, 0, gl.RGBA, gl.FLOAT, new Float32Array(256 * 4));
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.uniform1i(this.u.u_lut, 1);
+      gl.activeTexture(gl.TEXTURE0);
       this.srcW = this.srcH = 0; this.ts = 1;
       this.maxTex = Math.min(gl.getParameter(gl.MAX_TEXTURE_SIZE), 8192);
       const vp = gl.getParameter(gl.MAX_VIEWPORT_DIMS);
@@ -1348,12 +1492,25 @@ select option{background:#1b1b1d;color:var(--text)}
       gl.uniform1f(this.u.u_angle, (geo.angle || 0) * Math.PI / 180);
       gl.uniform1i(this.u.u_rot, geo.rot | 0);
       gl.uniform2f(this.u.u_flip, geo.flipH ? 1 : 0, geo.flipV ? 1 : 0);
-      const a = (k) => (adj && adj[k]) || 0;
+      /* Resposta progressiva dels lliscadors: poc efecte al principi, més cap als extrems (el 100% segueix sent el mateix) */
+      const EASE = { brightness: 1.45, contrast: 1.5, saturation: 1.45, ambience: 1.5, highlights: 1.4, shadows: 1.4, warmth: 1.3, tint: 1.3, sharpen: 1.4, vignette: 1.35 };
+      const a = (k) => { const v = (adj && adj[k]) || 0; return Math.sign(v) * Math.pow(Math.abs(v), EASE[k] || 1); };
       gl.uniform4f(this.u.u_a0, a('brightness'), a('contrast'), a('saturation'), a('ambience'));
       gl.uniform4f(this.u.u_a1, a('highlights'), a('shadows'), a('warmth'), a('tint'));
       gl.uniform2f(this.u.u_a2, Math.max(0, a('sharpen')), a('vignette'));
       gl.uniform1f(this.u.u_ts, this.ts);
-      gl.uniform1f(this.u.u_any, ADJ_KEYS.some((k) => Math.abs(a(k)) > 1e-6) ? 1 : 0);
+      const cv = adj && adj.curve && !window.LumenCurve.isIdentity(adj.curve) ? adj.curve : null;
+      gl.uniform1f(this.u.u_cv, cv ? 1 : 0);
+      if (cv) {
+        const key = JSON.stringify(cv);
+        if (key !== this.lutKey) {
+          this.lutKey = key;
+          gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, this.lutTex);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, 256, 1, 0, gl.RGBA, gl.FLOAT, window.LumenCurve.lut(cv));
+          gl.activeTexture(gl.TEXTURE0);
+        }
+      }
+      gl.uniform1f(this.u.u_any, ADJ_KEYS.some((k) => Math.abs(a(k)) > 1e-6) || cv ? 1 : 0);
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -1434,6 +1591,8 @@ select option{background:#1b1b1d;color:var(--text)}
       const cs = getComputedStyle(dock);
       if (wide) ins.r = dock.offsetWidth + (parseFloat(cs.right) || 20) + 20;
       else ins.b = dock.offsetHeight + (parseFloat(cs.bottom) || 10) + 12;
+      const cc = document.querySelector('#curve .cvCard');          // editor de corba obert: la foto es col·loca per sobre
+      if (cc && !$('curve').hidden) ins.b = Math.max(ins.b, cc.offsetHeight + 12);
     }
   }
   const ctr = () => ({ x: ins.l + (stage.clientWidth - ins.l - ins.r) / 2, y: ins.t + (stage.clientHeight - ins.t - ins.b) / 2 });
@@ -1572,6 +1731,11 @@ select option{background:#1b1b1d;color:var(--text)}
     b.addEventListener('click', () => select(a.k));
     chipsEl.appendChild(b);
   });
+  { const b = document.createElement('button');            // Corba de tons: obre l'editor gran
+    b.className = 'chip curveChip'; b.dataset.k = 'curve';
+    b.innerHTML = '<svg class="ic" aria-hidden="true"><use href="#i-spline"/></svg><span>' + t('adj_curve') + '</span>';
+    b.addEventListener('click', () => { if (S.has && L.curve) L.curve.open(); });
+    chipsEl.appendChild(b); }
   function updateVal() {
     const v = Math.round(S.adj[S.sel] * 100);
     $('adjVal').textContent = (v > 0 && ADJ.find((a) => a.k === S.sel).min < 0 ? '+' : '') + v;
@@ -1579,7 +1743,7 @@ select option{background:#1b1b1d;color:var(--text)}
   function markChips() {
     chipsEl.querySelectorAll('.chip').forEach((c) => {
       c.classList.toggle('on', c.dataset.k === S.sel);
-      c.classList.toggle('mod', Math.abs(S.adj[c.dataset.k]) > 1e-6);
+      c.classList.toggle('mod', c.dataset.k === 'curve' ? !!(S.adj.curve && !window.LumenCurve.isIdentity(S.adj.curve)) : Math.abs(S.adj[c.dataset.k]) > 1e-6);
     });
   }
   function select(k) {
@@ -1602,11 +1766,12 @@ select option{background:#1b1b1d;color:var(--text)}
     L.push(); S.adj[S.sel] = 0; select(S.sel); L.draw();
   });
   $('btnResetAll').addEventListener('click', () => {
-    if (!S.has || ADJ.every((a) => S.adj[a.k] === 0)) return;
+    if (!S.has || (ADJ.every((a) => S.adj[a.k] === 0) && !S.adj.curve)) return;
     L.push(); S.adj = zero(); select(S.sel); L.draw(); toast(t('toastReset'));
   });
-  function syncUI() { select(S.sel); if (L.crop) L.crop.syncUI(); }
+  function syncUI() { select(S.sel); if (L.crop) L.crop.syncUI(); if (L.curve) L.curve.sync(); }
   L.syncUI = syncUI;
+  L.syncChips = () => markChips();
 
   /* ---------- Pestanyes (Ajustos · Retall · Lot) ---------- */
   const TAB = { adjust: 'Adj', crop: 'Crop', styles: 'Styles', lot: 'Lot' };
@@ -2456,7 +2621,7 @@ select option{background:#1b1b1d;color:var(--text)}
   const picked = new Set();   // ids de les fotos marcades
 
   const ADJ_KEYS = Object.keys(L.zero());
-  const hasAdj = (adj) => !!adj && ADJ_KEYS.some((k) => Math.abs(adj[k] || 0) > 1e-6);
+  const hasAdj = (adj) => !!adj && (ADJ_KEYS.some((k) => Math.abs(adj[k] || 0) > 1e-6) || !!(adj.curve && !window.LumenCurve.isIdentity(adj.curve)));
   function geoEdited(g, w, h) {
     if (!g) return false;
     const c = g.crop;
@@ -2927,6 +3092,132 @@ select option{background:#1b1b1d;color:var(--text)}
       const s = clean({ name: name || 'Estil', adj, source: source || 'manual' }); if (!s) return null;
       mine.unshift(s); sel = s.id; thumbs.delete(s.id); await save(); render(); if (S.mode === 'styles') thumbsSoon(); return s;
     } };
+})();
+
+</script>
+<script>/* js/curve.js */
+/* Lumen — editor de la corba de tons (full inferior sobre la foto, amb histograma). */
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const L = window.L, S = L.S, t = L.t, C = window.LumenCurve;
+  const box = $('curve'), cv = $('cvCanvas'), g = cv.getContext('2d');
+  const COL = { l: '#f5f5f7', r: '#ff6b6b', g: '#6bff9b', b: '#6bb4ff' };
+  let ch = 'l', sel = 1, hist = null, drag = null, lastTap = { t: 0, i: -1 };
+  const PRESETS = [['cvSoft', [[0, 0], [0.25, 0.2], [0.75, 0.8], [1, 1]]], ['cvStrong', [[0, 0], [0.25, 0.16], [0.75, 0.85], [1, 1]]],
+    ['cvFade', [[0, 0.08], [0.25, 0.28], [0.75, 0.78], [1, 0.95]]], ['cvLift', [[0, 0], [0.2, 0.29], [0.6, 0.64], [1, 1]]], ['cvBright', [[0, 0], [0.5, 0.6], [1, 1]]]];
+
+  const cur = () => (S.adj.curve && S.adj.curve[ch]) || C.ID.map((p) => p.slice());
+  function store(pts) {                                    // desa una corba nova (objecte nou: l'historial no es contamina)
+    const c = Object.assign({}, S.adj.curve || {});
+    if (pts && !(pts.length === 2 && pts[0][1] === 0 && pts[1][1] === 1)) c[ch] = pts; else delete c[ch];
+    S.adj = Object.assign({}, S.adj);
+    if (Object.keys(c).length) S.adj.curve = c; else delete S.adj.curve;
+    L.draw(); L.syncChips && L.syncChips();
+  }
+  /* ---------- Dibuix ---------- */
+  function size() {
+    const w = cv.clientWidth || 280, d = Math.min(2, devicePixelRatio || 1);
+    if (cv.width !== Math.round(w * d)) { cv.width = Math.round(w * d); cv.height = Math.round(w * d); }
+    return { w, d };
+  }
+  function histogram() {
+    const it = L.items[L.cur]; hist = null; if (!it || !it.prev) return;
+    const c = document.createElement('canvas'), n = 96; c.width = c.height = n;
+    const x = c.getContext('2d', { willReadFrequently: true }); x.drawImage(it.prev, 0, 0, n, n);
+    const d = x.getImageData(0, 0, n, n).data, H = { l: new Float32Array(64), r: new Float32Array(64), g: new Float32Array(64), b: new Float32Array(64) };
+    for (let i = 0; i < d.length; i += 4) {
+      H.r[d[i] >> 2]++; H.g[d[i + 1] >> 2]++; H.b[d[i + 2] >> 2]++; H.l[Math.round(0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]) >> 2]++;
+    }
+    Object.values(H).forEach((a) => { const s = [...a].sort((p, q) => p - q), m = s[61] || 1; for (let i = 0; i < 64; i++) a[i] = Math.min(1, a[i] / m); });
+    hist = H;
+  }
+  function draw() {
+    const { w, d } = size(), P = w * d, pad = 10 * d, A = P - 2 * pad;
+    const X = (x) => pad + x * A, Y = (y) => pad + (1 - y) * A;
+    g.clearRect(0, 0, P, P);
+    g.fillStyle = 'rgba(255,255,255,.035)'; g.beginPath(); g.roundRect(pad, pad, A, A, 14 * d); g.fill();
+    g.strokeStyle = 'rgba(245,245,247,.08)'; g.lineWidth = d;
+    for (let i = 1; i < 4; i++) { g.beginPath(); g.moveTo(X(i / 4), Y(0)); g.lineTo(X(i / 4), Y(1)); g.moveTo(X(0), Y(i / 4)); g.lineTo(X(1), Y(i / 4)); g.stroke(); }
+    if (hist) {                                             // histograma de la foto original
+      const a = hist[ch]; g.fillStyle = ch === 'l' ? 'rgba(245,245,247,.16)' : COL[ch] + '33';
+      g.beginPath(); g.moveTo(X(0), Y(0));
+      for (let i = 0; i < 64; i++) g.lineTo(X((i + 0.5) / 64), Y(a[i] * 0.92));
+      g.lineTo(X(1), Y(0)); g.closePath(); g.fill();
+    }
+    g.setLineDash([4 * d, 5 * d]); g.strokeStyle = 'rgba(245,245,247,.22)'; g.beginPath(); g.moveTo(X(0), Y(0)); g.lineTo(X(1), Y(1)); g.stroke(); g.setLineDash([]);
+    const pts = cur(), s = C.sample(pts, 128);
+    g.strokeStyle = COL[ch]; g.lineWidth = 2.2 * d; g.lineJoin = 'round'; g.beginPath();
+    for (let i = 0; i < 128; i++) { const x = X(i / 127), y = Y(s[i]); i ? g.lineTo(x, y) : g.moveTo(x, y); }
+    g.stroke();
+    pts.forEach((p, i) => {
+      g.beginPath(); g.arc(X(p[0]), Y(p[1]), (i === sel ? 7.5 : 5.5) * d, 0, 6.2832);
+      g.fillStyle = i === sel ? '#f5f5f7' : '#0a0a0a'; g.fill(); g.strokeStyle = i === sel ? '#0a0a0a' : COL[ch]; g.lineWidth = 2 * d; g.stroke();
+    });
+    const p = pts[sel]; $('cvVal').textContent = p ? Math.round(p[0] * 100) + ' → ' + Math.round(p[1] * 100) : '';
+  }
+  const toPt = (e) => { const r = cv.getBoundingClientRect(), m = 10 / (cv.clientWidth || 280); return [(((e.clientX - r.left) / r.width) - m) / (1 - 2 * m), 1 - (((e.clientY - r.top) / r.height) - m) / (1 - 2 * m)]; };
+  const px = (p) => { const r = cv.getBoundingClientRect(), m = 10; return [m + p[0] * (r.width - 2 * m), m + (1 - p[1]) * (r.height - 2 * m)]; };
+
+  cv.addEventListener('pointerdown', (e) => {
+    if (!S.has) return; e.preventDefault(); cv.setPointerCapture(e.pointerId);
+    const pts = cur().map((p) => p.slice()), r = cv.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
+    let bi = -1, bd = 22;
+    pts.forEach((p, i) => { const q = px(p), dd = Math.hypot(q[0] - mx, q[1] - my); if (dd < bd) { bd = dd; bi = i; } });
+    const now = performance.now();
+    if (bi >= 0 && bi > 0 && bi < pts.length - 1 && lastTap.i === bi && now - lastTap.t < 340) {      // doble toc: treu el punt
+      L.push(); pts.splice(bi, 1); sel = Math.min(sel, pts.length - 1); store(pts); draw(); lastTap = { t: 0, i: -1 }; return;
+    }
+    lastTap = { t: now, i: bi };
+    L.push();
+    if (bi < 0) {                                           // nou punt sobre la corba
+      const q = toPt(e), x = Math.min(0.99, Math.max(0.01, q[0])), y = C.sample(pts, 256)[Math.round(x * 255)];
+      pts.push([x, y]); pts.sort((a, b) => a[0] - b[0]); bi = pts.findIndex((p) => p[0] === x);
+    }
+    sel = bi; drag = { pts, i: bi }; store(pts); draw();
+  });
+  cv.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const q = toPt(e), { pts, i } = drag, n = pts.length;
+    const lo = i === 0 ? 0 : pts[i - 1][0] + 0.01, hi = i === n - 1 ? 1 : pts[i + 1][0] - 0.01;
+    pts[i] = [i === 0 ? 0 : i === n - 1 ? 1 : Math.min(hi, Math.max(lo, q[0])), Math.min(1, Math.max(0, q[1]))];
+    store(pts.map((p) => p.slice())); draw();
+  });
+  ['pointerup', 'pointercancel'].forEach((ev) => cv.addEventListener(ev, () => { drag = null; }));
+
+  /* Pas fi amb fletxes (manté premut per repetir) */
+  document.querySelectorAll('#curve .cvNudge .nudge').forEach((b) => {
+    const [dx, dy] = b.dataset.d.split(',').map(Number); let t0 = 0, t1 = 0, pushed = false;
+    const go = () => {
+      const pts = cur().map((p) => p.slice()), p = pts[sel]; if (!p) return;
+      if (!pushed) { L.push(); pushed = true; }
+      const n = pts.length, lo = sel === 0 ? 0 : pts[sel - 1][0] + 0.005, hi = sel === n - 1 ? 1 : pts[sel + 1][0] - 0.005;
+      if (sel > 0 && sel < n - 1) p[0] = Math.min(hi, Math.max(lo, p[0] + dx * 0.005));
+      p[1] = Math.min(1, Math.max(0, p[1] + dy * 0.005)); store(pts); draw();
+    };
+    const stop = () => { clearTimeout(t0); clearInterval(t1); pushed = false; };
+    b.addEventListener('pointerdown', (e) => { e.preventDefault(); go(); t0 = setTimeout(() => { t1 = setInterval(go, 55); }, 380); });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach((ev) => b.addEventListener(ev, stop));
+  });
+  PRESETS.forEach(([k, pts]) => {
+    const b = document.createElement('button'); b.className = 'chip sm'; b.textContent = t(k);
+    b.addEventListener('click', () => { if (!S.has) return; L.push(); ch = 'l'; setCh(); store(pts.map((p) => p.slice())); sel = 1; draw(); });
+    $('cvPresets').appendChild(b);
+  });
+  function setCh() { document.querySelectorAll('#cvCh button').forEach((b) => b.classList.toggle('on', b.dataset.ch === ch)); }
+  $('cvCh').addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; ch = b.dataset.ch; sel = Math.min(1, cur().length - 1); setCh(); draw(); });
+  $('cvReset').addEventListener('click', () => {
+    if (!S.has || !S.adj.curve) return; L.push(); S.adj = Object.assign({}, S.adj); delete S.adj.curve; sel = 1; L.draw(); L.syncUI(); draw();
+  });
+  const close = () => { box.hidden = true; document.body.classList.remove('cvOpen'); L.resetView(); L.draw(); };
+  $('cvDone').addEventListener('click', close);
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !box.hidden) close(); });
+
+  L.curve = {
+    open() { if (!S.has) return; histogram(); sel = Math.min(1, cur().length - 1); setCh(); box.hidden = false; document.body.classList.add('cvOpen'); requestAnimationFrame(() => { draw(); L.resetView(); L.draw(); }); },
+    close,
+    sync() { if (box.hidden) return; histogram(); sel = Math.min(sel, cur().length - 1); draw(); }
+  };
 })();
 
 </script>
