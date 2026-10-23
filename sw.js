@@ -2,7 +2,7 @@
    Estratègia: "app shell" en memòria cau (cache-first) perquè l'app funcioni sense connexió.
    Totes les rutes són relatives, així funciona dins d'una subcarpeta (GitHub Pages: usuari.github.io/repo/).
    Quan publiquis una nova versió, puja el número de CACHE_VERSION. */
-const CACHE_VERSION = 'lumen-v4';
+const CACHE_VERSION = 'lumen-v5';
 const SHELL = [
   './',
   './index.html',
@@ -20,7 +20,9 @@ const SHELL = [
   './js/geometry.js',
   './js/engine.js',
   './js/app.js',
-  './js/crop.js'
+  './js/crop.js',
+  './js/batch.js',
+  './js/zip.js'
 ];
 
 self.addEventListener('install', (event) => {

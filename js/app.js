@@ -22,6 +22,8 @@
     draft: null, ratioId: 'free'
   });
   L.t = t;
+  L.zero = zero;
+  L.hooks = { items() {}, thumb() {}, dirty() {} };   // batch.js se'n serveix per pintar la tira i el panell Lot
 
   const stage = $('stage'), view = $('view'), ctx = view.getContext('2d');
   const amb = $('ambient'), actx = amb.getContext('2d');
@@ -103,6 +105,7 @@
     ctx.drawImage(engine.canvas, 0, 0);
     scheduleAmbient();
     if (L.crop) L.crop.sync();
+    L.hooks.dirty();
   }
 
   /* ---------- Halo ambiental: miniatura de la foto, ampliada i difuminada per CSS ---------- */
@@ -121,7 +124,7 @@
   L.push = () => { S.history.push(snap()); if (S.history.length > 100) S.history.shift(); S.future.length = 0; updateBtns(); };
   function restore(str) {
     const o = JSON.parse(str);
-    S.adj = Object.assign(zero(), o.adj); S.geo = o.geo;
+    S.adj = Object.assign(zero(), o.adj); S.geo = o.geo || defGeo(S.srcW, S.srcH);
     S.draft = S.mode === 'crop' ? Object.assign({}, S.geo.crop) : null;
     L.resetView(); syncUI(); L.draw(); updateBtns();
   }
@@ -186,22 +189,29 @@
   function syncUI() { select(S.sel); if (L.crop) L.crop.syncUI(); }
   L.syncUI = syncUI;
 
-  /* ---------- Pestanyes ---------- */
+  /* ---------- Pestanyes (Ajustos · Retall · Lot) ---------- */
+  const TAB = { adjust: 'Adj', crop: 'Crop', lot: 'Lot' };
+  function applyTabs(m) {
+    Object.keys(TAB).forEach((k) => {
+      $('tab' + TAB[k]).classList.toggle('on', k === m);
+      $('tab' + TAB[k]).setAttribute('aria-selected', k === m);
+      $('panel' + TAB[k]).hidden = k !== m;
+    });
+    $('tools').dataset.active = m;
+  }
   function setMode(m) {
     if (m === S.mode) return;
     if (m === 'crop' && !S.has) return;
     if (S.mode === 'crop' && L.crop) L.crop.leave(true);
     S.mode = m;
-    $('tabAdj').classList.toggle('on', m === 'adjust'); $('tabCrop').classList.toggle('on', m === 'crop');
-    $('tabAdj').setAttribute('aria-selected', m === 'adjust'); $('tabCrop').setAttribute('aria-selected', m === 'crop');
-    $('tools').dataset.active = m;
-    $('panelAdj').hidden = m !== 'adjust'; $('panelCrop').hidden = m !== 'crop';
+    applyTabs(m);
     if (m === 'crop' && L.crop) L.crop.enter();
     L.resetView(); L.draw();
   }
   L.setMode = setMode;
   $('tabAdj').addEventListener('click', () => setMode('adjust'));
   $('tabCrop').addEventListener('click', () => setMode('crop'));
+  $('tabLot').addEventListener('click', () => setMode('lot'));
 
   /* ---------- Gestos de la vista: zoom i desplaçament ---------- */
   const ptrs = new Map();
@@ -217,7 +227,7 @@
     clampView(); L.draw(); flash('×' + S.view.zoom.toFixed(1));
   }
   stage.addEventListener('pointerdown', (e) => {
-    if (!S.has || S.mode !== 'adjust' || e.target.closest('button')) return;
+    if (!S.has || S.mode === 'crop' || e.target.closest('button')) return;
     stage.setPointerCapture(e.pointerId);
     ptrs.set(e.pointerId, { lx: e.clientX, ly: e.clientY, x0: e.clientX, y0: e.clientY, t0: performance.now(), moved: false });
     if (ptrs.size === 2) {
@@ -243,11 +253,35 @@
     } else if (ptrs.size === 1 && S.view.zoom > 1.001) {
       const sc = L.scale();
       S.view.cx -= dx / sc; S.view.cy -= dy / sc; clampView(); L.draw();
+    } else if (ptrs.size === 1 && items.length > 1) {
+      /* Llisca cap als costats per canviar de foto (només amb zoom 1) */
+      const sx = e.clientX - p.x0, sy = e.clientY - p.y0;
+      if (!p.sw && Math.abs(sx) > 12 && Math.abs(sx) > Math.abs(sy) * 1.3) p.sw = true;
+      if (p.sw) {
+        const edge = (sx > 0 && L.cur === 0) || (sx < 0 && L.cur === items.length - 1);
+        const off = sx * (edge ? 0.18 : 0.7);
+        view.style.transition = 'none';
+        view.style.transform = 'translateX(' + off + 'px)';
+        view.style.opacity = String(1 - Math.min(0.5, Math.abs(off) / 500));
+      }
     }
   });
+  function resetSwipe() {
+    view.style.transition = 'transform .35s cubic-bezier(.22,1,.36,1),opacity .35s';
+    view.style.transform = ''; view.style.opacity = '';
+  }
   function endPtr(e) {
     const p = ptrs.get(e.pointerId); if (!p) return;
     ptrs.delete(e.pointerId);
+    if (p.sw) {
+      const sx = e.clientX - p.x0, dt = performance.now() - p.t0;
+      const fast = Math.abs(sx) > 40 && Math.abs(sx) / dt > 0.5;
+      if (e.type === 'pointerup' && (Math.abs(sx) > Math.min(110, stage.clientWidth * 0.22) || fast) && L.go(sx < 0 ? 1 : -1)) {
+        /* la foto nova ja neteja la transformació quan estigui llesta (activate) */
+      } else resetSwipe();
+      if (ptrs.size === 0) gesture = null;
+      return;
+    }
     const now = performance.now();
     if (e.type === 'pointerup' && !p.moved && now - p.t0 < 300 && ptrs.size === 0 && gesture && gesture.type === 'pan') {
       if (now - lastTap.t < 320 && Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < 30) {
@@ -261,11 +295,11 @@
   stage.addEventListener('pointerup', endPtr);
   stage.addEventListener('pointercancel', endPtr);
   stage.addEventListener('dblclick', (e) => {
-    if (!S.has || S.mode !== 'adjust' || e.pointerType === 'touch') return;
+    if (!S.has || S.mode === 'crop' || e.pointerType === 'touch') return;
     const r = rectOf(); zoomAt(e.clientX - r.left, e.clientY - r.top, S.view.zoom > 1.05 ? 1 : 2.5);
   });
   stage.addEventListener('wheel', (e) => {
-    if (!S.has || S.mode !== 'adjust') return;
+    if (!S.has || S.mode === 'crop') return;
     e.preventDefault();
     const r = rectOf();
     zoomAt(e.clientX - r.left, e.clientY - r.top, S.view.zoom * Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0015)));
@@ -278,83 +312,195 @@
   ['pointerup', 'pointercancel', 'lostpointercapture'].forEach((ev) => bc.addEventListener(ev, () => setCompare(false)));
   bc.addEventListener('contextmenu', (e) => e.preventDefault());
 
-  /* ---------- Obrir fotos ---------- */
+  /* ---------- Lot de fotos ---------- */
+  /* Cada foto del lot guarda el seu propi estat (ajustos, retall, historial). El motor només té una textura:
+     en canviar de foto es torna a descodificar el fitxer original i es restaura l'estat de la foto. */
+  const items = (L.items = []);
+  L.cur = -1;
+  let nid = 1, actToken = 0;
+  const defGeo = (w, h) => ({ rot: 0, flipH: false, flipV: false, angle: 0, crop: { x: 0, y: 0, w, h } });
+  L.defGeo = defGeo;
+
   async function decodeViaImg(file) {
     const url = URL.createObjectURL(file), img = new Image();
     img.src = url;
     try { await img.decode(); } finally { setTimeout(() => URL.revokeObjectURL(url), 5000); }
     return img;
   }
-  async function loadFile(file) {
-    if (!engine) { toast(t('toastNoGL')); return; }
-    if (!file || !(file.type || '').startsWith('image/')) { toast(t('toastErrOpen')); return; }
-    $('loading').hidden = false;
+  async function decodeFile(file) {
+    try { return await createImageBitmap(file, { imageOrientation: 'from-image', premultiplyAlpha: 'none' }); }
+    catch (e) { return decodeViaImg(file); }
+  }
+  function saveCur() {
+    const it = items[L.cur]; if (!it || !S.has) return;
+    it.adj = S.adj; it.geo = S.geo; it.history = S.history; it.future = S.future; it.ratioId = S.ratioId; it.w = S.srcW; it.h = S.srcH;
+  }
+  L.saveCur = saveCur;
+
+  /* Activa la foto i-èssima. Retorna true / false (cancel·lada per una altra) / 'err' (no s'ha pogut obrir) */
+  async function activate(i, dir) {
+    if (!engine) { toast(t('toastNoGL')); return 'err'; }
+    if (i < 0 || i >= items.length) return false;
+    if (i === L.cur && S.has) return true;
+    const token = ++actToken, it = items[i];
+    const slow = setTimeout(() => { if (token === actToken) $('loading').hidden = false; }, 250);
     try {
-      let bmp;
-      try { bmp = await createImageBitmap(file, { imageOrientation: 'from-image', premultiplyAlpha: 'none' }); }
-      catch (e) { bmp = await decodeViaImg(file); }
+      const bmp = await decodeFile(it.file);
+      if (token !== actToken) { if (bmp.close) bmp.close(); return false; }
+      if (S.mode === 'crop' && L.crop) { L.crop.leave(false); S.mode = 'adjust'; applyTabs('adjust'); }
+      saveCur();
       const info = engine.setSource(bmp);
       if (bmp.close) bmp.close();
-      if (S.mode === 'crop' && L.crop) L.crop.leave(false);
-      S.mode = 'adjust';
-      $('tabAdj').classList.add('on'); $('tabCrop').classList.remove('on'); $('tools').dataset.active = 'adjust';
-      $('panelAdj').hidden = false; $('panelCrop').hidden = true;
-      S.srcW = info.w; S.srcH = info.h; S.has = true;
-      S.name = (file.name || 'foto').replace(/\.[^.]+$/, '') || 'foto';
-      S.adj = zero(); S.history = []; S.future = []; S.draft = null; S.ratioId = 'free';
-      S.geo = { rot: 0, flipH: false, flipV: false, angle: 0, crop: { x: 0, y: 0, w: info.w, h: info.h } };
+      L.cur = items.indexOf(it);
+      S.srcW = info.w; S.srcH = info.h; S.has = true; S.name = it.name; S.editing = false; S.comparing = false;
+      S.adj = it.adj || zero(); S.history = it.history || []; S.future = it.future || [];
+      S.ratioId = it.ratioId || 'free'; S.draft = null;
+      S.geo = it.geo || defGeo(info.w, info.h);
+      it.w = info.w; it.h = info.h;
       $('empty').hidden = true;
       $('app').classList.remove('noimg');
       ['btnExport', 'btnCompare'].forEach((id) => ($(id).disabled = false));
       updateBtns(); syncUI(); L.resetView(); L.draw();
+      L.hooks.items();
       if (info.downscaled) toast(t('toastBig'));
+      /* entrada suau de la foto nova, des del costat cap on s'ha lliscat */
+      view.style.transition = 'none'; view.style.transform = ''; view.style.opacity = '';
+      if (dir && view.animate) view.animate(
+        [{ transform: 'translateX(' + (dir * 56) + 'px)', opacity: 0 }, { transform: 'none', opacity: 1 }],
+        { duration: 340, easing: 'cubic-bezier(.22,1,.36,1)' });
+      return true;
     } catch (e) {
-      console.error(e); toast(t('toastErrOpen'));
-    } finally { $('loading').hidden = true; }
+      console.error(e);
+      if (token !== actToken) return false;
+      view.style.transition = ''; view.style.transform = ''; view.style.opacity = '';
+      toast(t('toastErrOpen'));
+      const idx = items.indexOf(it);
+      if (idx >= 0) { items.splice(idx, 1); if (idx < L.cur) L.cur--; L.hooks.items(); }
+      return 'err';
+    } finally { clearTimeout(slow); if (token === actToken) $('loading').hidden = true; }
   }
-  L.loadFile = loadFile;
+  L.activate = (i) => activate(i, i > L.cur ? 1 : -1);
+  L.go = (d) => {
+    const n = L.cur + d;
+    if (n < 0 || n >= items.length) return false;
+    activate(n, d); return true;
+  };
+
+  /* Miniatures: es generen una a una en segon pla, sense bloquejar l'edició */
+  let thumbBusy = false;
+  async function makeThumb(file) {
+    let bmp;
+    try { bmp = await createImageBitmap(file, { imageOrientation: 'from-image', resizeWidth: 220, resizeQuality: 'low' }); }
+    catch (e) { try { bmp = await decodeViaImg(file); } catch (e2) { return ''; } }
+    const bw = bmp.width || bmp.naturalWidth, bh = bmp.height || bmp.naturalHeight, S2 = 112;
+    const c = document.createElement('canvas'); c.width = c.height = S2;
+    const k = Math.max(S2 / bw, S2 / bh), dw = bw * k, dh = bh * k;
+    c.getContext('2d').drawImage(bmp, (S2 - dw) / 2, (S2 - dh) / 2, dw, dh);
+    if (bmp.close) bmp.close();
+    return c.toDataURL('image/jpeg', 0.72);
+  }
+  async function runThumbs() {
+    if (thumbBusy) return; thumbBusy = true;
+    try {
+      let it;
+      while ((it = items.find((x) => x.thumb === '')) ) {
+        it.thumb = 'pending';
+        const url = await makeThumb(it.file);
+        it.thumb = url || 'none';
+        L.hooks.thumb(it);
+      }
+    } finally { thumbBusy = false; }
+  }
+
+  async function addFiles(files) {
+    if (!engine) { toast(t('toastNoGL')); return; }
+    const list = [...files].filter((f) => f && (f.type || '').startsWith('image/'));
+    if (!list.length) { toast(t('toastErrOpen')); return; }
+    const first = items.length;
+    list.forEach((f) => items.push({
+      id: nid++, file: f, name: (f.name || 'foto').replace(/\.[^.]+$/, '') || 'foto',
+      adj: null, geo: null, history: [], future: [], ratioId: 'free', thumb: '', w: 0, h: 0
+    }));
+    L.hooks.items();
+    let res = 'err';
+    while (res === 'err' && first < items.length) res = await activate(first);
+    runThumbs();
+    if (list.length > 1) toast(t('toastAdded').replace('{n}', list.length));
+  }
+  L.addFiles = addFiles;
+  L.loadFile = (f) => addFiles([f]);
+
+  function showEmpty() {
+    S.has = false; S.mode = 'adjust'; applyTabs('adjust'); L.cur = -1;
+    $('empty').hidden = false; $('app').classList.add('noimg');
+    ['btnExport', 'btnCompare', 'btnUndo', 'btnRedo'].forEach((id) => ($(id).disabled = true));
+    ctx.clearRect(0, 0, view.width, view.height); amb.width = amb.width;
+    sheet.hidden = true;
+    L.hooks.items();
+  }
+  L.removeCur = async () => {
+    if (L.cur < 0) return;
+    const i = L.cur; items.splice(i, 1); actToken++; L.cur = -1;
+    if (!items.length) { showEmpty(); return; }
+    let res = 'err', k = Math.min(i, items.length - 1);
+    while (res === 'err' && items.length) { res = await activate(Math.min(k, items.length - 1)); }
+    if (!items.length) showEmpty();
+    toast(t('toastRemoved'));
+  };
+
   const fileIn = $('fileIn');
   const openDlg = () => fileIn.click();
+  L.openDlg = openDlg;
   $('btnOpen').addEventListener('click', openDlg);
   $('btnOpen2').addEventListener('click', openDlg);
-  fileIn.addEventListener('change', () => { if (fileIn.files[0]) loadFile(fileIn.files[0]); fileIn.value = ''; });
+  fileIn.addEventListener('change', () => { if (fileIn.files.length) addFiles(fileIn.files); fileIn.value = ''; });
   window.addEventListener('dragover', (e) => e.preventDefault());
   window.addEventListener('drop', (e) => e.preventDefault());
   stage.addEventListener('dragover', (e) => { e.preventDefault(); stage.classList.add('drag'); });
   stage.addEventListener('dragleave', () => stage.classList.remove('drag'));
-  stage.addEventListener('drop', (e) => { e.preventDefault(); stage.classList.remove('drag'); const f = e.dataTransfer.files[0]; if (f) loadFile(f); });
-  document.addEventListener('paste', (e) => { const f = e.clipboardData && e.clipboardData.files[0]; if (f && f.type.startsWith('image/')) loadFile(f); });
+  stage.addEventListener('drop', (e) => { e.preventDefault(); stage.classList.remove('drag'); if (e.dataTransfer.files.length) addFiles(e.dataTransfer.files); });
+  document.addEventListener('paste', (e) => {
+    const fs = e.clipboardData ? [...e.clipboardData.files].filter((f) => f.type.startsWith('image/')) : [];
+    if (fs.length) addFiles(fs);
+  });
 
   /* ---------- Exportació ---------- */
   const sheet = $('sheet');
-  const EXP = { fmt: 'jpeg', q: 92, size: 'orig' };
+  const EXP = { fmt: 'jpeg', q: 92, size: 'orig', scope: 'one' };
   const MIME = { jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' };
   const EXT = { jpeg: 'jpg', png: 'png', webp: 'webp' };
-  function outSize() {
-    const c = S.geo.crop, cw = Math.round(c.w), ch = Math.round(c.h), long = Math.max(cw, ch);
+  function outSizeFor(c) {
+    const cw = Math.round(c.w), ch = Math.round(c.h), long = Math.max(cw, ch);
     let k = EXP.size === 'orig' ? 1 : Math.min(1, EXP.size / long);
     let limited = false;
     if (long * k > engine.maxOut) { k = engine.maxOut / long; limited = true; }
     return { w: Math.max(1, Math.round(cw * k)), h: Math.max(1, Math.round(ch * k)), limited };
   }
+  const outSize = () => outSizeFor(S.geo.crop);
+  const batchScope = () => EXP.scope === 'all' && items.length > 1;
   function fillSizes() {
-    const c = S.geo.crop, long = Math.round(Math.max(c.w, c.h)), sel = $('sizeSel');
+    const c = S.geo.crop, long = Math.round(Math.max(c.w, c.h)), sel = $('sizeSel'), all = batchScope();
     sel.innerHTML = '';
-    const opts = [['orig', t('fullSize') + ' (' + Math.round(c.w) + '×' + Math.round(c.h) + ')']];
-    [4096, 2048, 1080].forEach((n) => { if (n < long) opts.push([String(n), n + ' px · ' + t('longSide')]); });
+    const opts = [['orig', all ? t('fullSize') : t('fullSize') + ' (' + Math.round(c.w) + '×' + Math.round(c.h) + ')']];
+    [4096, 2048, 1080].forEach((n) => { if (all || n < long) opts.push([String(n), n + ' px · ' + t('longSide')]); });
     opts.forEach(([v, label]) => { const o = document.createElement('option'); o.value = v; o.textContent = label; sel.appendChild(o); });
     if (!opts.some(([v]) => v === String(EXP.size))) EXP.size = 'orig';
     sel.value = String(EXP.size);
   }
   function updExportInfo() {
-    const o = outSize();
-    $('exportInfo').textContent = o.w + '×' + o.h + ' px · ' + (o.w * o.h / 1e6).toFixed(1) + ' ' + t('mpx') +
+    const o = outSize(), all = batchScope();
+    $('sheetTitle').textContent = t(all ? 'exportLotTitle' : 'exportTitle');
+    $('btnExpGo').textContent = t(all ? 'saveZip' : 'save');
+    $('exportInfo').textContent = all ? items.length + ' ' + t('photosZip') + (EXP.fmt === 'png' ? ' · ' + t('hintPng') : '') : o.w + '×' + o.h + ' px · ' + (o.w * o.h / 1e6).toFixed(1) + ' ' + t('mpx') +
       (EXP.fmt === 'png' ? ' · ' + t('hintPng') : '') + (o.limited ? ' · ' + t('hintLimit') : '');
     $('qField').hidden = EXP.fmt === 'png';
   }
   function openExport() {
     if (!S.has) return;
     if (S.mode === 'crop') setMode('adjust');
+    EXP.scope = 'one';
+    $('scopeField').hidden = items.length < 2;
+    $('scopeSeg').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x.dataset.s === 'one'));
     fillSizes(); updExportInfo(); sheet.hidden = false;
   }
   const closeExport = () => { sheet.hidden = true; };
@@ -366,6 +512,12 @@
     EXP.fmt = b.dataset.f;
     $('fmtSeg').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
     updExportInfo();
+  });
+  $('scopeSeg').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    EXP.scope = b.dataset.s;
+    $('scopeSeg').querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
+    fillSizes(); updExportInfo();
   });
   $('qSlider').addEventListener('input', (e) => { EXP.q = +e.target.value; $('qVal').textContent = EXP.q; paint(e.target); });
   $('sizeSel').addEventListener('change', (e) => { EXP.size = e.target.value === 'orig' ? 'orig' : +e.target.value; updExportInfo(); });
@@ -382,9 +534,44 @@
     setTimeout(() => URL.revokeObjectURL(a.href), 15000);
     return true;
   }
+  /* Exporta tot el lot en un ZIP: cada foto es descodifica, es renderitza amb el seu estat i es desa */
+  async function exportAll() {
+    saveCur();
+    const keep = L.cur, files = [], used = {};
+    try {
+      for (let i = 0; i < items.length; i++) {
+        const it = items[i];
+        $('exportInfo').textContent = t('exporting') + ' ' + (i + 1) + ' / ' + items.length + '…';
+        const bmp = await decodeFile(it.file);
+        const info = engine.setSource(bmp); if (bmp.close) bmp.close();
+        const g = it.geo || defGeo(info.w, info.h), o = outSizeFor(g.crop);
+        engine.render(o.w, o.h, { rot: g.rot, flipH: g.flipH, flipV: g.flipV, angle: g.angle, crop: g.crop }, it.adj || zero(), g.crop);
+        let blob = await engine.toBlob(MIME[EXP.fmt], EXP.q / 100);
+        if (!blob || (blob.type && blob.type !== MIME[EXP.fmt])) { if (EXP.fmt !== 'jpeg') blob = await engine.toBlob(MIME.jpeg, EXP.q / 100); }
+        if (!blob) throw new Error('blob');
+        const ext = blob.type === 'image/png' ? 'png' : blob.type === 'image/webp' ? 'webp' : 'jpg';
+        const base = it.name + '-lumen'; used[base] = (used[base] || 0) + 1;
+        files.push({ name: base + (used[base] > 1 ? '-' + used[base] : '') + '.' + ext, data: new Uint8Array(await blob.arrayBuffer()) });
+        await new Promise((r) => setTimeout(r, 0));
+      }
+      return LumenZip.make(files);
+    } finally {
+      /* torna a posar a la textura la foto que s'estava editant */
+      try {
+        const bmp = await decodeFile(items[keep].file); engine.setSource(bmp); if (bmp.close) bmp.close();
+      } catch (e) { console.error(e); }
+    }
+  }
+
   $('btnExpGo').addEventListener('click', async () => {
     const btn = $('btnExpGo'); btn.disabled = true;
     try {
+      if (batchScope()) {
+        const zip = await exportAll();
+        closeExport();
+        if (await shareOrDownload(zip, 'lumen-lot.zip')) toast(t('toastZip'));
+        return;
+      }
       const o = outSize(), g = S.geo;
       let fmt = EXP.fmt;
       engine.render(o.w, o.h, { rot: g.rot, flipH: g.flipH, flipV: g.flipV, angle: g.angle, crop: g.crop }, S.adj, g.crop);
@@ -407,6 +594,8 @@
     if (mod && k === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); }
     else if (mod && k === 'y') { e.preventDefault(); redo(); }
     else if (!mod && !e.repeat && k === 'o') openDlg();
+    else if (!mod && /^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName) === false && e.key === 'ArrowRight') L.go(1);
+    else if (!mod && /^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName) === false && e.key === 'ArrowLeft') L.go(-1);
     else if (!mod && !e.repeat && k === 'c') setCompare(true);
   });
   window.addEventListener('keyup', (e) => { if (e.key.toLowerCase() === 'c') setCompare(false); });

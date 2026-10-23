@@ -1,4 +1,4 @@
-# Lumen — editor de fotos (fase 1 + disseny)
+# Lumen — editor de fotos (fases 1 i 2)
 
 Editor de fotos personal que s'instal·la com una app (PWA) i funciona sense connexió.
 Les fotos **mai surten del teu dispositiu**: tot el procés es fa al navegador.
@@ -13,6 +13,14 @@ Les fotos **mai surten del teu dispositiu**: tot el procés es fa al navegador.
 - Desfer / refer (**Ctrl+Z** / **Ctrl+Maj+Z**)
 - Exportació a JPG, PNG o WebP, amb qualitat i mida a escollir
 
+## Fase 2: treballar en lot
+- Obre diverses fotos alhora (o arrossega-les). Apareix una **tira de miniatures** dins del panell.
+- **Llisca** a esquerra/dreta sobre la foto (amb zoom 1), toca una miniatura o usa les **fletxes** del teclat.
+- Cada foto té els seus propis ajustos, retall i historial de desfer. Un puntet marca les fotos editades.
+- Pestanya **Lot**: copia/enganxa ajustos, **Aplica a totes**, **Selecciona** (marca miniatures i enganxa només a aquestes),
+  afegeix fotos o treu la foto actual del lot. Només es copien els ajustos de color; el retall és de cada foto.
+- **Exporta → Tot el lot**: baixa un únic ZIP amb totes les fotos (cadascuna amb el seu retall i ajustos).
+
 ## Fitxers
 ```
 index.html               l'app (estructura)
@@ -23,6 +31,8 @@ sw.js                    funcionament sense connexió
 icons/                   icones de l'app
 js/i18n.js               textos (català; preparat per afegir castellà i anglès)
 js/geometry.js           càlculs del retall
+js/zip.js                creador de ZIP (exportació del lot)
+js/batch.js              tira de miniatures i panell Lot
 js/engine.js             motor de render (WebGL2)
 js/app.js, js/crop.js    interfície i eines
 ```
@@ -42,7 +52,7 @@ js/app.js, js/crop.js    interfície i eines
 
 ## Actualitzar l'app
 Substitueix els fitxers al repositori i, a `sw.js`, puja el número de `CACHE_VERSION`
-(`lumen-v3` → `lumen-v4`) perquè els dispositius descarreguin la versió nova.
+(`lumen-v5` → `lumen-v6`) perquè els dispositius descarreguin la versió nova.
 
 ## Afegir idiomes
 A `js/i18n.js`, copia el bloc `ca`, canvia la clau (`es`, `en`) i tradueix els textos.
