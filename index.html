@@ -482,9 +482,11 @@ select option{background:#1b1b1d;color:var(--text)}
 
 /* ===== 16. INICI ===== */
 #home{position:fixed;inset:0;z-index:14;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  background:radial-gradient(90% 45% at 50% 0%,rgba(245,245,247,.08),transparent 70%),rgba(10,10,10,.96);
-  -webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px)}
+  background:#0a0a0a}
 #home[hidden]{display:none}
+#homeBg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.homeIn{position:relative;z-index:1}
+.qbtn span{white-space:nowrap}
 #home.in .homeIn>*{animation:libIn .55s var(--ease) both}
 #home.in .homeIn>*:nth-child(2){animation-delay:.05s}#home.in .homeIn>*:nth-child(3){animation-delay:.1s}
 #home.in .homeIn>*:nth-child(4){animation-delay:.15s}#home.in .homeIn>*:nth-child(5){animation-delay:.2s}
@@ -726,6 +728,7 @@ select option{background:#1b1b1d;color:var(--text)}
 
 <!-- Pantalla d'inici -->
 <div id="home" hidden>
+  <canvas id="homeBg" aria-hidden="true"></canvas>
   <div class="homeIn">
     <header class="homeHead"><div class="hi" id="homeHi"></div><div class="hsub" data-i18n="homeSub">Què vols editar avui?</div></header>
     <button class="continue" id="homeCont"><span class="cvr"><img id="homeCover" alt=""><span class="cph"><svg class="ic" aria-hidden="true"><use href="#i-images"/></svg></span></span>
@@ -735,7 +738,7 @@ select option{background:#1b1b1d;color:var(--text)}
       <button class="qbtn" id="qaPhotos"><svg class="ic" aria-hidden="true"><use href="#i-image-plus"/></svg><span data-i18n="qaPhotos">Afegeix fotos</span></button>
       <button class="qbtn" id="qaNew"><svg class="ic" aria-hidden="true"><use href="#i-folder-plus"/></svg><span data-i18n="qaNew">Nova carpeta</span></button>
       <button class="qbtn" id="qaImport"><svg class="ic" aria-hidden="true"><use href="#i-folder-down"/></svg><span data-i18n="qaImport">Importa carpeta</span></button>
-      <button class="qbtn" id="qaStyle"><svg class="ic" aria-hidden="true"><use href="#i-wand-sparkles"/></svg><span data-i18n="qaStyle">Extreu estil d'una foto</span></button>
+      <button class="qbtn" id="qaStyle"><svg class="ic" aria-hidden="true"><use href="#i-wand-sparkles"/></svg><span data-i18n="qaStyle">Extreu estil</span></button>
     </div>
     <section class="hsec" id="homeRecentSec"><div class="hsecHead"><h3 data-i18n="homeRecent">Darreres carpetes</h3><button class="link" id="homeAll" data-i18n="homeAll">Veure-les totes</button></div><div class="hrow" id="homeRecent"></div></section>
     <section class="hsec"><div class="hsecHead"><h3 data-i18n="homeStyles">Els meus estils</h3></div><div class="hrow chips" id="homeStyles"></div></section>
@@ -791,7 +794,7 @@ select option{background:#1b1b1d;color:var(--text)}
       toastExApplied: 'Estil aplicat', toastExBad: 'No s\'ha pogut analitzar aquesta imatge',
       homeTitle: 'Inici', hiMorning: 'Bon dia', hiAfternoon: 'Bona tarda', hiNight: 'Bona nit', homeSub: 'Què vols editar avui?',
       homeContinue: 'Continua', homeContinueEmpty: 'Comença',
-      qaPhotos: 'Afegeix fotos', qaNew: 'Nova carpeta', qaImport: 'Importa carpeta', qaStyle: 'Extreu estil d\'una foto',
+      qaPhotos: 'Afegeix fotos', qaNew: 'Nova carpeta', qaImport: 'Importa carpeta', qaStyle: 'Extreu estil',
       homeRecent: 'Darreres carpetes', homeAll: 'Veure-les totes', homeStyles: 'Els meus estils', homeNoStyles: 'Encara no tens estils desats. Extreu-ne un d\'una foto o desa\'n un des d\'Estils.',
       tipHome: 'Inici', homeEnter: 'Entra a l\'editor',
       photoOf: 'Foto {a} de {b}', onePhoto: 'Una sola foto. Afegeix-ne més per treballar en lot.',
@@ -3088,8 +3091,38 @@ select option{background:#1b1b1d;color:var(--text)}
     if (!mine.length) st.innerHTML = '<p class="hempty">' + esc(t('homeNoStyles')) + '</p>';
     mine.forEach((s) => { const b = document.createElement('button'); b.className = 'chip'; b.dataset.id = s.id; b.innerHTML = svg('wand-sparkles') + '<span>' + esc(s.name) + '</span>'; st.appendChild(b); });
   }
-  function open() { render(); home.hidden = false; home.classList.remove('in'); void home.offsetWidth; home.classList.add('in'); }
-  function close() { home.hidden = true; }
+  /* Fons: ones blanques suaus en moviment (canvas 2D, ~30 fps, s'atura quan l'inici està amagat) */
+  const bg = $('homeBg'), bx = bg.getContext('2d'), still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let raf = 0, last = 0, W = 0, H = 0;
+  const WAVES = [ // [altura 0..1, amplitud px, longitud d'ona px, velocitat, fase, gruix de la banda px, alfa]
+    [0.30, 46, 520, 0.00018, 0.0, 150, 0.075], [0.42, 60, 700, -0.00013, 1.7, 190, 0.065],
+    [0.58, 52, 600, 0.00022, 3.1, 170, 0.07], [0.72, 70, 820, -0.00016, 4.6, 220, 0.06], [0.86, 40, 480, 0.00025, 2.2, 130, 0.07]];
+  function size() { const d = Math.min(2, window.devicePixelRatio || 1); W = innerWidth; H = innerHeight; bg.width = W * d; bg.height = H * d; bx.setTransform(d, 0, 0, d, 0, 0); }
+  function paintBg(now) {
+    bx.clearRect(0, 0, W, H);
+    const g = bx.createRadialGradient(W * 0.5, -H * 0.05, 0, W * 0.5, -H * 0.05, H * 0.8);
+    g.addColorStop(0, 'rgba(245,245,247,.13)'); g.addColorStop(1, 'rgba(245,245,247,0)'); bx.fillStyle = g; bx.fillRect(0, 0, W, H);
+    WAVES.forEach((w, k) => {
+      const y0 = H * w[0], ph = w[4] + now * w[3] * 2 * Math.PI, ph2 = ph * 0.7 + k;
+      const yy = (x) => y0 + Math.sin(x / w[2] * 2 * Math.PI + ph) * w[1] + Math.sin(x / (w[2] * 0.53) * 2 * Math.PI - ph2) * w[1] * 0.35;
+      bx.beginPath(); bx.moveTo(0, yy(0));
+      for (let x = 8; x <= W + 8; x += 8) bx.lineTo(x, yy(x));
+      for (let x = W + 8; x >= -8; x -= 8) bx.lineTo(x, yy(x) + w[5] + Math.sin(x / 300 + ph) * 24);
+      bx.closePath();
+      const f = bx.createLinearGradient(0, y0 - w[1], 0, y0 + w[5] + w[1]);
+      f.addColorStop(0, 'rgba(245,245,247,0)'); f.addColorStop(0.35, 'rgba(245,245,247,' + w[6] + ')'); f.addColorStop(1, 'rgba(245,245,247,0)');
+      bx.fillStyle = f; bx.fill();
+      bx.beginPath(); for (let x = 0; x <= W + 8; x += 8) (x ? bx.lineTo(x, yy(x)) : bx.moveTo(x, yy(x)));
+      bx.strokeStyle = 'rgba(245,245,247,' + (w[6] * 1.6) + ')'; bx.lineWidth = 1; bx.stroke();
+    });
+  }
+  function loop(ts) { raf = requestAnimationFrame(loop); if (ts - last < 32) return; last = ts; paintBg(ts); }
+  function startBg() { size(); cancelAnimationFrame(raf); if (still) paintBg(0); else raf = requestAnimationFrame(loop); }
+  function stopBg() { cancelAnimationFrame(raf); }
+  window.addEventListener('resize', () => { if (!home.hidden) { size(); if (still) paintBg(0); } });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stopBg(); else if (!home.hidden) startBg(); });
+  function open() { render(); startBg(); home.hidden = false; home.classList.remove('in'); void home.offsetWidth; home.classList.add('in'); }
+  function close() { home.hidden = true; stopBg(); }
   L.home = { open, close };
 
   $('homeCont').addEventListener('click', async () => {
