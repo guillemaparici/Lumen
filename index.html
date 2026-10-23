@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Lumen — Editor de fotos</title>
+<meta name="description" content="Editor de fotos personal: ajustos, retall i exportació. Funciona sense connexió.">
+<meta name="theme-color" content="#090807">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lumen">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preload" href="fonts/instrument-serif-400-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/hanken-grotesk-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <button class="ibtn" id="btnOpen" aria-label="Obrir foto" title="Obrir foto (O)"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></button>
+    <div class="brand"><i></i>Lumen</div>
+    <button class="ibtn" id="btnCompare" aria-label="Mantén premut per veure l'original" title="Mantén premut: original (C)" disabled><svg viewBox="0 0 24 24"><path d="M12 3v18"/><rect x="3" y="5" width="18" height="14" rx="2"/></svg></button>
+    <button class="ibtn" id="btnUndo" aria-label="Desfer" title="Desfer (Ctrl+Z)" disabled><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
+    <button class="ibtn" id="btnRedo" aria-label="Refer" title="Refer (Ctrl+Maj+Z)" disabled><svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></svg></button>
+    <button class="pill" id="btnExport" disabled><svg viewBox="0 0 24 24" style="width:17px;height:17px"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg><span data-i18n="export">Exporta</span></button>
+  </header>
+
+  <main id="stage" data-drop="Deixa la foto aquí">
+    <canvas id="view"></canvas>
+    <div id="cropLayer" hidden></div>
+    <div id="badge"></div>
+    <div id="empty">
+      <img class="logo" src="icons/icon-192.png" alt="">
+      <h1><span data-i18n="emptyTitle1">Dona</span> <em data-i18n="emptyTitle2">llum a les teves fotos</em></h1>
+      <p data-i18n="emptyText">Obre una foto per començar. Tot es queda al teu dispositiu.</p>
+      <button class="pill" id="btnOpen2"><span data-i18n="openPhoto">Obre una foto</span></button>
+    </div>
+    <div id="loading" hidden><span data-i18n="loading">Carregant…</span></div>
+  </main>
+
+  <section id="dock" aria-label="Eines">
+    <div id="tools" role="tablist">
+      <button id="tabAdj" class="on" role="tab"><svg viewBox="0 0 24 24"><path d="M4 6h10"/><path d="M18 6h2"/><circle cx="16" cy="6" r="2"/><path d="M4 12h2"/><path d="M10 12h10"/><circle cx="8" cy="12" r="2"/><path d="M4 18h12"/><path d="M20 18h0"/><circle cx="18" cy="18" r="2"/></svg><span data-i18n="tabAdjust">Ajustos</span></button>
+      <button id="tabCrop" role="tab"><svg viewBox="0 0 24 24"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg><span data-i18n="tabCrop">Retall</span></button>
+    </div>
+
+    <div id="panelAdj" class="panel">
+      <div class="chips" id="adjChips"></div>
+      <div class="sliderRow">
+        <span class="name" id="adjName"></span>
+        <input type="range" id="adjSlider" aria-label="Valor de l'ajust">
+        <span class="val" id="adjVal">0</span>
+      </div>
+      <div class="row">
+        <button class="btn ghost" id="btnResetOne" data-i18n="resetOne">Restableix aquest</button>
+        <span class="grow"></span>
+        <button class="btn ghost" id="btnResetAll" data-i18n="resetAll">Restableix tot</button>
+      </div>
+    </div>
+
+    <div id="panelCrop" class="panel" hidden>
+      <div class="chips" id="ratioChips"></div>
+      <div class="sliderRow">
+        <span class="name" data-i18n="straighten">Endreça</span>
+        <input type="range" id="angleSlider" min="-45" max="45" step="0.1" value="0" aria-label="Endreçar horitzó">
+        <span class="val" id="angleVal">0°</span>
+      </div>
+      <div class="row">
+        <button class="btn" id="btnRotL"><svg viewBox="0 0 24 24" style="width:17px;height:17px"><path d="M3 8V3m0 5h5"/><path d="M3.5 8A9 9 0 1 1 3 13"/></svg><span data-i18n="rotL">90°</span></button>
+        <button class="btn" id="btnRotR"><svg viewBox="0 0 24 24" style="width:17px;height:17px"><path d="M21 8V3m0 5h-5"/><path d="M20.5 8A9 9 0 1 0 21 13"/></svg><span data-i18n="rotR">90°</span></button>
+        <button class="btn" id="btnFlipH" data-i18n="flipH">Voltea ↔</button>
+        <button class="btn" id="btnFlipV" data-i18n="flipV">Voltea ↕</button>
+        <span class="grow"></span>
+        <button class="btn ghost" id="btnCropReset" data-i18n="resetCrop">Restableix</button>
+        <button class="btn primary" id="btnCropApply" data-i18n="apply">Aplica</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div id="sheet" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <h2 id="sheetTitle" data-i18n="exportTitle">Exporta la foto</h2>
+    <div class="field"><label data-i18n="format">Format</label>
+      <div class="seg" id="fmtSeg"><button data-f="jpeg" class="on">JPG</button><button data-f="png">PNG</button><button data-f="webp">WebP</button></div></div>
+    <div class="field" id="qField"><label data-i18n="quality">Qualitat</label>
+      <input type="range" id="qSlider" min="40" max="100" value="92"><span class="val" id="qVal">92</span></div>
+    <div class="field"><label data-i18n="size">Mida</label>
+      <select id="sizeSel"></select></div>
+    <p class="hint" id="exportInfo"></p>
+    <div class="row" style="padding:14px 0 0">
+      <button class="btn ghost" id="btnExpCancel" data-i18n="cancel">Cancel·la</button>
+      <span class="grow"></span>
+      <button class="btn primary" id="btnExpGo" data-i18n="save">Desa</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<input type="file" id="fileIn" accept="image/*" hidden>
+
+<script src="js/i18n.js"></script>
+<script src="js/geometry.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/app.js"></script>
+<script src="js/crop.js"></script>
+<script>
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
