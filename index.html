@@ -81,7 +81,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 /* 4. CRISTAL Y BORDE FINO -------------------------------------------------
    Cristal: fondo translúcido + desenfoque del contenido que hay detrás.
    Borde:   1px con degradado (más luz arriba), dibujado con una máscara. */
-#topbar,#dock,#toast,#badge,#sheet .card{
+#topbar,#dock,#toast,#badge,#sheet .card,#dlg .card{
   background:linear-gradient(180deg,rgba(42,42,45,.56) 0%,rgba(16,16,18,.68) 100%);
   -webkit-backdrop-filter:blur(26px) saturate(165%);backdrop-filter:blur(26px) saturate(165%);
   box-shadow:
@@ -91,10 +91,10 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
     0 30px 70px rgba(0,0,0,.40);               /* ambiente */
 }
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
-  #topbar,#dock,#toast,#badge,#sheet .card{background:linear-gradient(180deg,#232325,#121213)}
+  #topbar,#dock,#toast,#badge,#sheet .card,#dlg .card{background:linear-gradient(180deg,#232325,#121213)}
 }
 :is(.ibtn,.btn,.chip,.pill,.seg,#tools){position:relative}
-:is(#topbar,#dock,#toast,#badge,#sheet .card,.ibtn,.btn,.chip,.pill,.seg,#tools)::before{
+:is(#topbar,#dock,#toast,#badge,#sheet .card,#dlg .card,.ibtn,.btn,.chip,.pill,.seg,#tools)::before{
   content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;
   background:linear-gradient(180deg,rgba(255,255,255,.28) 0%,rgba(255,255,255,.06) 42%,rgba(255,255,255,.10) 100%);
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
@@ -375,6 +375,74 @@ select option{background:#1b1b1d;color:var(--text)}
 @media (max-width:370px){.brand span{display:none}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01s!important;animation-delay:0s!important;transition-duration:.01s!important}}
 
+/* ===== 12. PANELLS D'IGUAL ALÇADA (referència: Ajustos) ===== */
+:root{--ph:140px}
+.panel{height:var(--ph);overflow:hidden}
+.ibtn.sq{width:38px;height:38px}
+.lotRow4{padding:6px 14px 0}
+.lbtn{height:46px;gap:3px;font-size:11px;border-radius:14px}
+.lbtn .ic{width:17px;height:17px}
+.lotWrap{padding:6px 14px 0;gap:5px}
+.lotWrap .btn.primary{height:36px}
+.lotRow2 .btn{height:30px;font-size:12.5px}
+
+/* ===== 13. BIBLIOTECA DE CARPETES ===== */
+#library{position:fixed;inset:0;z-index:15;display:flex;flex-direction:column;
+  background:radial-gradient(90% 50% at 50% 0%,rgba(245,245,247,.07),transparent 70%),rgba(10,10,10,.9);
+  -webkit-backdrop-filter:blur(30px) saturate(150%);backdrop-filter:blur(30px) saturate(150%)}
+#library[hidden]{display:none}
+#library.in{animation:libIn .45s var(--ease) both}
+@keyframes libIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.libTop{display:flex;align-items:center;gap:10px;padding:calc(var(--safe-t) + 12px) 14px 8px}
+.libTop h2{margin:0 auto 0 4px;font-family:var(--serif);font-weight:400;font-style:italic;font-size:32px;line-height:1}
+.pill.sm{height:36px;padding:0 16px 0 12px;font-size:13.5px;margin:0}
+.libBody{flex:1;overflow-y:auto;padding:8px 14px calc(var(--safe-b) + 24px);-webkit-overflow-scrolling:touch}
+#libGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (min-width:640px){#libGrid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}.libBody{padding:8px 28px 32px}}
+.fcard{position:relative;display:flex;flex-direction:column;border-radius:22px;overflow:hidden;text-align:left;cursor:pointer;
+  background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.025));
+  box-shadow:0 0 0 1px rgba(245,245,247,.10) inset,0 14px 34px rgba(0,0,0,.45);
+  animation:rise .6s var(--ease) var(--d,0ms) both;
+  transition:transform .35s var(--ease),box-shadow .35s var(--ease)}
+.fcard.open{box-shadow:0 0 0 1.5px rgba(245,245,247,.75) inset,0 14px 34px rgba(0,0,0,.45),0 0 28px var(--glow)}
+@media (hover:hover){.fcard:hover{transform:translateY(-3px) scale(1.015);box-shadow:0 0 0 1px rgba(245,245,247,.2) inset,0 22px 44px rgba(0,0,0,.55),0 0 30px rgba(245,245,247,.08)}}
+.fcard:active{transform:scale(.975);transition-duration:.08s}
+.fcard .cover{position:relative;aspect-ratio:4/3;background:rgba(255,255,255,.04);display:grid;place-items:center;overflow:hidden}
+.fcard .cover img{width:100%;height:100%;object-fit:cover;display:block}
+.fcard .ph .ic{width:34px;height:34px;color:var(--dim)}
+.fcard .tag{position:absolute;left:8px;top:8px;font-size:10.5px;font-weight:620;padding:3px 8px;border-radius:999px;background:var(--light);color:var(--ink)}
+.finfo{padding:10px 12px 12px}
+.fname{font-weight:600;font-size:14.5px;line-height:1.25;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;word-break:break-word}
+.fmeta{margin-top:3px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.facts{position:absolute;right:8px;top:8px;display:flex;gap:6px}
+.mini{min-width:30px;height:30px;padding:0 7px;border-radius:15px;display:grid;place-items:center;color:var(--text);
+  background:rgba(10,10,10,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 0 0 1px rgba(245,245,247,.14) inset;
+  transition:transform .25s var(--ease),background .25s}
+.mini .ic{width:15px;height:15px}
+.mini span{font-size:11.5px;font-weight:620;white-space:nowrap}
+.mini.arm{background:var(--light);color:var(--ink)}
+@media (hover:hover){.mini:hover{transform:scale(1.1);background:rgba(245,245,247,.2)}.mini.arm:hover{background:var(--light)}}
+.mini:active{transform:scale(.92)}
+.fcard.new{align-items:center;justify-content:center;gap:12px;min-height:150px;background:none;
+  box-shadow:0 0 0 1.5px rgba(245,245,247,.18) inset;border:0;color:var(--text)}
+.fcard.new .plus{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:var(--light);color:var(--ink);box-shadow:0 8px 26px rgba(245,245,247,.16)}
+.fcard.new .plus .ic{width:24px;height:24px}
+.fcard.new .fname{text-align:center}
+.libEmpty{margin:40px auto 0;max-width:30ch;text-align:center;color:var(--muted);font-size:14.5px;line-height:1.5}
+
+/* Diàleg de nom */
+#dlg{position:fixed;inset:0;z-index:25;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.6);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);animation:fadeIn .25s ease both}
+#dlg[hidden]{display:none}
+#dlg .card{width:min(420px,100%);animation:sheetUp .45s var(--ease) both}
+#dlg h2{margin:0 0 6px;font-family:var(--serif);font-style:italic;font-weight:400;font-size:30px}
+.field.col{display:flex;flex-direction:column;align-items:stretch;gap:6px;margin-top:12px}
+.field.col label{font-size:12.5px;color:var(--muted)}
+#dlg input{height:46px;border-radius:14px;padding:0 14px;font:inherit;font-size:16px;color:var(--text);background:rgba(255,255,255,.05);
+  border:0;box-shadow:0 0 0 1px rgba(245,245,247,.12) inset;outline:none;color-scheme:dark;transition:box-shadow .25s}
+#dlg input:focus{box-shadow:0 0 0 1.5px rgba(245,245,247,.6) inset,0 0 20px rgba(245,245,247,.08)}
+#dlg .card{position:relative;border-radius:28px;padding:24px 22px 20px}
+
 </style>
 </head>
 <body>
@@ -393,6 +461,11 @@ select option{background:#1b1b1d;color:var(--text)}
   <symbol id="i-flip-horizontal-2" viewBox="0 0 24 24"><path d="M10 12H8" /> <path d="M16 12h-2" /> <path d="M22 12h-2" /> <path d="M4 12H2" /> <path d="M7.298 20.288A1 1 0 008 22h8a1 1 0 00.703-1.712l-3.991-3.99a1 1 0 00-1.424-.001z" /> <path d="M7.298 3.712A1 1 0 018 2h8a1 1 0 01.703 1.712l-3.991 3.99a1 1 0 01-1.424.001z" /></symbol>
   <symbol id="i-flip-vertical-2" viewBox="0 0 24 24"><path d="M12 14v2" /> <path d="M12 20v2" /> <path d="M12 2v2" /> <path d="M12 8v2" /> <path d="M20.288 16.703A1 1 0 0022 16V8a1 1 0 00-1.712-.703l-3.99 3.991a1 1 0 00-.001 1.424z" /> <path d="M3.712 16.703A1 1 0 012 16V8a1 1 0 011.712-.703l3.99 3.991a1 1 0 01.001 1.424z" /></symbol>
   <symbol id="i-image-plus" viewBox="0 0 24 24"><path d="M16 5h6" /> <path d="M19 2v6" /> <path d="M21 11.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7.5" /> <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /> <circle cx="9" cy="9" r="2" /></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></symbol>
+  <symbol id="i-folder-plus" viewBox="0 0 24 24"><path d="M12 10v6" /> <path d="M9 13h6" /> <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></symbol>
+  <symbol id="i-folder-down" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /> <path d="M12 10v6" /> <path d="m15 13-3 3-3-3" /></symbol>
+  <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" /> <path d="m15 5 4 4" /></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18" /> <path d="m6 6 12 12" /></symbol>
   <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></symbol>
   <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6" /></symbol>
   <symbol id="i-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /> <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></symbol>
@@ -425,7 +498,8 @@ select option{background:#1b1b1d;color:var(--text)}
 
   <!-- BARRA SUPERIOR (vidre) -->
   <header id="topbar">
-    <button class="ibtn" id="btnOpen" data-i18n-title="tipOpen" title="Obre una foto (O)"><svg class="ic" aria-hidden="true"><use href="#i-folder-open"/></svg></button>
+    <button class="ibtn" id="btnFolder" data-i18n-title="tipFolder" title="Carpetes"><svg class="ic" aria-hidden="true"><use href="#i-folder-open"/></svg></button>
+    <button class="ibtn" id="btnOpen" data-i18n-title="tipOpen" title="Afegeix fotos (O)"><svg class="ic" aria-hidden="true"><use href="#i-image-plus"/></svg></button>
     <span class="grow"></span>
     <button class="ibtn" id="btnCompare" data-i18n-title="tipCompare" title="Mantén premut per veure l'original (C)" disabled><svg class="ic" aria-hidden="true"><use href="#i-columns-2"/></svg></button>
     <button class="ibtn" id="btnUndo" data-i18n-title="tipUndo" title="Desfés (Ctrl+Z)" disabled><svg class="ic" aria-hidden="true"><use href="#i-undo-2"/></svg></button>
@@ -520,8 +594,33 @@ select option{background:#1b1b1d;color:var(--text)}
   </div>
 </div>
 
+<!-- BIBLIOTECA DE CARPETES (vidre a pantalla completa) -->
+<div id="library" hidden>
+  <header class="libTop">
+    <button class="ibtn" id="libClose" data-i18n-title="close" aria-label="Tanca"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+    <h2 data-i18n="folders">Carpetes</h2>
+    <button class="pill sm" id="libImport"><svg class="ic" aria-hidden="true"><use href="#i-folder-down"/></svg><span data-i18n="importFolder">Importa</span></button>
+  </header>
+  <div class="libBody"><div id="libGrid"></div><p id="libEmpty" class="libEmpty" hidden data-i18n="libEmpty"></p></div>
+</div>
+
+<!-- Diàleg de nom de carpeta -->
+<div id="dlg" hidden>
+  <form class="card" id="dlgForm" autocomplete="off">
+    <h2 id="dlgTitle"></h2>
+    <div class="field col"><label for="dlgName" data-i18n="folderName">Nom de la carpeta</label><input id="dlgName" type="text" maxlength="80" placeholder="JA vs Rioollet"></div>
+    <div class="field col"><label for="dlgDate" data-i18n="folderDate">Data</label><input id="dlgDate" type="date"></div>
+    <div class="row sheetActions">
+      <button type="button" class="btn ghost" id="dlgCancel" data-i18n="cancel">Cancel·la</button>
+      <span class="grow"></span>
+      <button type="submit" class="btn primary" id="dlgOk" data-i18n="save">Desa</button>
+    </div>
+  </form>
+</div>
+
 <div id="toast" role="status" aria-live="polite"></div>
 <input type="file" id="fileIn" accept="image/*" multiple hidden>
+<input type="file" id="dirIn" webkitdirectory multiple hidden>
 
 <script>/* js/i18n.js */
 /* Lumen — textos de la interfície.
@@ -535,8 +634,13 @@ select option{background:#1b1b1d;color:var(--text)}
       openPhoto: 'Obre una foto', loading: 'Carregant…', dropHere: 'Deixa la foto aquí',
       tabAdjust: 'Ajustos', tabCrop: 'Retall', tabLot: 'Lot',
       // lot de fotos
-      tipFineL: 'Pas fi −', tipFineR: 'Pas fi +', clearLot: 'Buida el lot', clearSure: 'Segur? Toca de nou', addPhotosS: 'Afegeix', copyS: 'Copia', pasteS: 'Enganxa', removeS: 'Treu aquesta',
+      tipFineL: 'Pas fi −', tipFineR: 'Pas fi +', clearLot: 'Buida carpeta', clearSure: 'Segur? Toca de nou', addPhotosS: 'Afegeix', copyS: 'Copia', pasteS: 'Enganxa', removeS: 'Treu aquesta',
       toastCleared: 'Lot buidat', toastRestored: 'Sessió recuperada · {n}',
+      tipFolder: 'Carpetes', folders: 'Carpetes', close: 'Tanca', importFolder: 'Importa', newFolder: 'Nova carpeta',
+      libEmpty: 'Encara no tens cap carpeta. Crea\'n una per a cada partit o sessió i hi trobaràs les fotos editades.',
+      folderName: 'Nom de la carpeta', folderDate: 'Data', newFolderTitle: 'Nova carpeta', renameTitle: 'Canvia el nom',
+      photosN: '{n} fotos', photoN1: '1 foto', openNow: 'Oberta', delSure: 'Segur?', tipRename: 'Canvia el nom', tipDelete: 'Elimina la carpeta',
+      folderAuto: 'Carpeta', folderOld: 'Sessió anterior', toastFolderDeleted: 'Carpeta eliminada', toastNoImgs: 'No hi ha cap imatge en aquesta carpeta',
       photoOf: 'Foto {a} de {b}', onePhoto: 'Una sola foto. Afegeix-ne més per treballar en lot.',
       addPhotos: 'Afegeix fotos', removePhoto: 'Treu aquesta foto del lot',
       copyAdj: 'Copia ajustos', pasteAdj: 'Enganxa ajustos', pasteSel: 'Enganxa a {n}', applyAll: 'Aplica a totes',
@@ -553,7 +657,7 @@ select option{background:#1b1b1d;color:var(--text)}
       resetCrop: 'Restableix', apply: 'Aplica',
       exportTitle: 'Exporta la foto', format: 'Format', quality: 'Qualitat', size: 'Mida', cancel: 'Cancel·la', save: 'Desa',
       // consells (tooltips)
-      tipOpen: 'Obre una foto (O)', tipCompare: 'Mantén premut per veure l\'original (C)', tipUndo: 'Desfés (Ctrl+Z)', tipRedo: 'Refés (Ctrl+Maj+Z)',
+      tipOpen: 'Afegeix fotos (O)', tipCompare: 'Mantén premut per veure l\'original (C)', tipUndo: 'Desfés (Ctrl+Z)', tipRedo: 'Refés (Ctrl+Maj+Z)',
       tipRotL: 'Gira a l\'esquerra', tipRotR: 'Gira a la dreta', tipFlipH: 'Voltea horitzontalment', tipFlipV: 'Voltea verticalment',
       // ajustos
       adj_brightness: 'Brillantor', adj_contrast: 'Contrast', adj_saturation: 'Saturació', adj_ambience: 'Ambient',
@@ -790,22 +894,18 @@ select option{background:#1b1b1d;color:var(--text)}
 
   window.LumenStore = {
     putFile: (id, blob, name, type) => safe(tx(['files'], 'readwrite', (t) => wrap(t.objectStore('files').put({ id, blob, name, type })))),
-    delFile: (id) => safe(tx(['files'], 'readwrite', (t) => wrap(t.objectStore('files').delete(id)))),
-    saveMeta: (meta) => safe(tx(['meta'], 'readwrite', (t) => wrap(t.objectStore('meta').put(meta, 'session')))),
-    async load() {
-      return safe(tx(['files', 'meta'], 'readonly', async (t) => {
-        const meta = await wrap(t.objectStore('meta').get('session'));
-        if (!meta || !meta.items || !meta.items.length) return null;
-        const files = {};
-        for (const it of meta.items) { const f = await wrap(t.objectStore('files').get(it.id)); if (f) files[it.id] = f; }
-        return { meta, files };
+    delFiles: (ids) => safe(tx(['files'], 'readwrite', (t) => { const st = t.objectStore('files'); ids.forEach((i) => st.delete(i)); return null; })),
+    delFile(id) { return this.delFiles([id]); },
+    /** Registres petits (índex de carpetes, estat de cada carpeta) */
+    setMeta: (key, val) => safe(tx(['meta'], 'readwrite', (t) => wrap(t.objectStore('meta').put(val, key)))),
+    getMeta: (key) => safe(tx(['meta'], 'readonly', (t) => wrap(t.objectStore('meta').get(key)))),
+    delMeta: (key) => safe(tx(['meta'], 'readwrite', (t) => wrap(t.objectStore('meta').delete(key)))),
+    async getFiles(ids) {
+      const out = await safe(tx(['files'], 'readonly', async (t) => {
+        const o = {}; for (const id of ids) { const f = await wrap(t.objectStore('files').get(id)); if (f) o[id] = f; } return o;
       }));
+      return out || {};
     },
-    /** Esborra tot el que no sigui a la llista d'ids (neteja de fitxers orfes). */
-    prune: (keep) => safe(tx(['files'], 'readwrite', async (t) => {
-      const st = t.objectStore('files'), keys = await wrap(st.getAllKeys());
-      keys.forEach((k) => { if (!keep.includes(k)) st.delete(k); });
-    })),
     clear: () => safe(tx(['files', 'meta'], 'readwrite', (t) => { t.objectStore('files').clear(); t.objectStore('meta').clear(); return null; })),
     persist: () => { try { return navigator.storage && navigator.storage.persist ? navigator.storage.persist() : null; } catch (e) { return null; } }
   };
@@ -1127,7 +1227,7 @@ select option{background:#1b1b1d;color:var(--text)}
   });
   L.t = t;
   L.zero = zero;
-  L.hooks = { items() {}, thumb() {}, dirty() {} };   // batch.js se'n serveix per pintar la tira i el panell Lot
+  L.hooks = { items() {}, thumb() {}, dirty() {}, folder() {}, openLibrary() {} };   // batch.js se'n serveix per pintar la tira i el panell Lot
 
   const stage = $('stage'), view = $('view'), ctx = view.getContext('2d');
   const amb = $('ambient'), actx = amb.getContext('2d', { willReadFrequently: true }), shadowEl = $('photoShadow');
@@ -1640,6 +1740,7 @@ select option{background:#1b1b1d;color:var(--text)}
     if (!engine) { toast(t('toastNoGL')); return; }
     const list = [...files].filter((f) => f && (f.type || '').startsWith('image/'));
     if (!list.length) { toast(t('toastErrOpen')); return; }
+    await L.ensureFolder();
     const first = items.length;
     list.forEach((f) => { const it = newItem(f, nid++); items.push(it); LumenStore.putFile(it.id, f, f.name || it.name, f.type); });
     LumenStore.persist();
@@ -1676,10 +1777,10 @@ select option{background:#1b1b1d;color:var(--text)}
     if (!items.length) showEmpty();
     toast(t('toastRemoved')); L.persistNow();
   };
-  L.clearAll = () => {
-    items.splice(0, items.length); showEmpty();
-    L.setClip && L.setClip(null);
-    LumenStore.clear(); toast(t('toastCleared'));
+  L.clearAll = async () => {
+    const ids = items.map((x) => x.id);
+    resetRuntime(); await LumenStore.delFiles(ids);
+    await L.persistNow(); toast(t('toastCleared'));
   };
 
   const fileIn = $('fileIn');
@@ -1698,33 +1799,66 @@ select option{background:#1b1b1d;color:var(--text)}
     if (fs.length) addFiles(fs);
   });
 
-  /* ---------- Desat de la sessió (IndexedDB) ---------- */
-  let sigSaved = '', saveTimer = 0;
-  const sessionSig = () => L.cur + '|' + items.length + '|' + (S.has ? JSON.stringify(S.adj) + JSON.stringify(S.geo) + S.history.length + '/' + S.future.length : '') +
+  /* ---------- Carpetes + desat (IndexedDB) ----------
+     Cada carpeta (p. ex. un partit) té el seu lot de fotos amb ajustos, retalls i historial propis.
+     Només la carpeta activa és a memòria; la resta viu a IndexedDB i es carrega en obrir-la. */
+  const folders = (L.folders = []);
+  let activeId = null, nfid = 1, sigSaved = '', saveTimer = 0;
+  L.activeFolder = () => folders.find((f) => f.id === activeId) || null;
+  const todayISO = () => { const d = new Date(), z = (n) => String(n).padStart(2, '0'); return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()); };
+  L.todayISO = todayISO;
+  const saveIndex = () => LumenStore.setMeta('index', { v: 2, folders, active: activeId, nid, nfid });
+
+  const sessionSig = () => activeId + '|' + L.cur + '|' + items.length + '|' + (S.has ? JSON.stringify(S.adj) + JSON.stringify(S.geo) + S.history.length + '/' + S.future.length : '') +
     '|' + JSON.stringify(L.getClip ? L.getClip() : null) + '|' + items.map((x) => x.id + (x === items[L.cur] ? '' : (x.history ? x.history.length : 0)) + (x.adj ? 'a' : '')).join(',');
   function buildMeta() {
     saveCur();
-    return { v: 1, cur: L.cur, nid, clip: L.getClip ? L.getClip() : null,
+    return { v: 2, cur: L.cur, clip: L.getClip ? L.getClip() : null,
       items: items.map((x) => ({ id: x.id, name: x.name, adj: x.adj, geo: x.geo, ratioId: x.ratioId, w: x.w, h: x.h,
         history: (x.history || []).slice(-60), future: (x.future || []).slice(-30) })) };
   }
+  /* Portada de la carpeta: la primera foto, en mida mitjana */
+  function coverOf(it) {
+    if (!it || !it.prev) return '';
+    if (it.cover && it.coverId === it.id) return it.cover;
+    const W = 420, k = Math.min(1, W / it.prev.width), c = document.createElement('canvas');
+    c.width = Math.round(it.prev.width * k); c.height = Math.round(it.prev.height * k);
+    const x = c.getContext('2d'); x.imageSmoothingQuality = 'high'; x.drawImage(it.prev, 0, 0, c.width, c.height);
+    it.cover = c.toDataURL('image/jpeg', 0.72); it.coverId = it.id; return it.cover;
+  }
   L.persistNow = () => {
     clearTimeout(saveTimer); saveTimer = 0;
-    if (!items.length) { sigSaved = ''; return LumenStore.clear(); }
+    const f = L.activeFolder();
+    if (!f) return saveIndex();
+    f.count = items.length; f.updated = Date.now();
+    const cv = coverOf(items[0]); if (cv) f.cover = cv; else if (!items.length) f.cover = '';
     sigSaved = sessionSig();
-    return LumenStore.saveMeta(buildMeta());
+    return Promise.all([LumenStore.setMeta('f' + f.id, buildMeta()), saveIndex()]);
   };
   function persistCheck() {
-    if (!items.length) return;
+    if (activeId == null) return;
     if (sessionSig() !== sigSaved && !saveTimer) saveTimer = setTimeout(L.persistNow, 700);
   }
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && items.length) L.persistNow(); });
-  window.addEventListener('pagehide', () => { if (items.length) L.persistNow(); });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden' && activeId != null) L.persistNow(); });
+  window.addEventListener('pagehide', () => { if (activeId != null) L.persistNow(); });
 
-  async function restoreSession() {
-    const sess = await LumenStore.load();
-    if (!sess || items.length) return;
-    const { meta, files } = sess;
+  /* Buida l'estat d'edició en memòria (no toca res del que hi ha desat) */
+  function resetRuntime() {
+    actToken++; clearTimeout(saveTimer); saveTimer = 0;
+    items.splice(0, items.length); L.cur = -1;
+    S.history = []; S.future = []; S.draft = null;
+    if (L.setClip) L.setClip(null);
+    showEmpty();
+  }
+  async function openFolder(id, force) {
+    if (id === activeId && !force) return true;
+    const f = folders.find((x) => x.id === id); if (!f) return false;
+    if (activeId != null && !force) await L.persistNow();
+    resetRuntime();
+    activeId = id; sigSaved = '';
+    const meta = (await LumenStore.getMeta('f' + id)) || { items: [], cur: 0 };
+    const files = await LumenStore.getFiles(meta.items.map((m) => m.id));
+    if (activeId !== id) return false;
     meta.items.forEach((m) => {
       const rec = files[m.id]; if (!rec) return;
       const it = newItem(rec.blob, m.id, m.name);
@@ -1732,17 +1866,67 @@ select option{background:#1b1b1d;color:var(--text)}
       it.ratioId = m.ratioId || 'free'; it.w = m.w || 0; it.h = m.h || 0;
       items.push(it);
     });
-    if (!items.length) return;
-    nid = Math.max(meta.nid || 1, ...items.map((x) => x.id + 1));
     if (L.setClip) L.setClip(meta.clip || null);
     L.hooks.items();
-    let k = Math.min(Math.max(meta.cur, 0), items.length - 1), res = 'err';
-    while (res === 'err' && k < items.length) res = await activate(k++);
-    if (res === true) {
-      sigSaved = sessionSig();
-      toast(t('toastRestored').replace('{n}', items.length));
+    let ok = false;
+    if (items.length) {
+      let k = Math.min(Math.max(meta.cur || 0, 0), items.length - 1), res = 'err';
+      while (res === 'err' && k < items.length) { res = await activate(k); if (res === 'err') dropItem(items[k]); }
+      ok = res === true;
+      if (!ok) showEmpty();
       runBg();
-    } else showEmpty();
+    }
+    sigSaved = sessionSig(); saveIndex();
+    L.hooks.folder();
+    return true;
+  }
+  L.openFolder = openFolder;
+  async function createFolder(name, date) {
+    const f = { id: nfid++, name: (name || '').trim() || 'Carpeta nova', date: date || todayISO(), count: 0, cover: '', updated: Date.now() };
+    folders.unshift(f); await saveIndex();
+    await openFolder(f.id);
+    return f;
+  }
+  L.createFolder = createFolder;
+  L.renameFolder = async (id, name, date) => {
+    const f = folders.find((x) => x.id === id); if (!f) return;
+    f.name = (name || '').trim() || f.name; f.date = date || f.date; await saveIndex(); L.hooks.folder();
+  };
+  L.deleteFolder = async (id) => {
+    const f = folders.find((x) => x.id === id); if (!f) return;
+    const meta = await LumenStore.getMeta('f' + id);
+    if (meta && meta.items.length) await LumenStore.delFiles(meta.items.map((m) => m.id));
+    await LumenStore.delMeta('f' + id);
+    folders.splice(folders.indexOf(f), 1);
+    if (activeId === id) { activeId = null; resetRuntime(); }
+    await saveIndex(); L.hooks.folder();
+  };
+  /* Afegeix fotos a la carpeta activa (en crea una automàticament si encara no n'hi ha cap) */
+  L.ensureFolder = async () => {
+    if (activeId != null) return;
+    const d = new Date(), z = (n) => String(n).padStart(2, '0');
+    await createFolder(t('folderAuto') + ' ' + z(d.getDate()) + '/' + z(d.getMonth() + 1) + '/' + String(d.getFullYear()).slice(2));
+  };
+
+  async function restoreSession() {
+    let index = await LumenStore.getMeta('index');
+    if (!index) {                                        // migració de la versió anterior (una sola sessió)
+      const old = await LumenStore.getMeta('session');
+      if (old && old.items && old.items.length) {
+        const f = { id: 1, name: t('folderOld'), date: todayISO(), count: old.items.length, cover: '', updated: Date.now() };
+        await LumenStore.setMeta('f1', { v: 2, cur: old.cur, clip: old.clip, items: old.items });
+        index = { v: 2, folders: [f], active: 1, nid: old.nid || 1, nfid: 2 };
+        await LumenStore.setMeta('index', index); await LumenStore.delMeta('session');
+      }
+    }
+    if (!index) return;
+    folders.splice(0, folders.length, ...(index.folders || []));
+    nid = Math.max(index.nid || 1, nid); nfid = index.nfid || (Math.max(0, ...folders.map((x) => x.id)) + 1);
+    if (index.active != null && folders.some((f) => f.id === index.active)) {
+      await openFolder(index.active, true);
+      if (items.length) toast(t('toastRestored').replace('{n}', items.length));
+    } else if (folders.length) L.hooks.openLibrary();
+    L.hooks.folder();
   }
   L.restoreSession = restoreSession;
 
@@ -2242,6 +2426,108 @@ select option{background:#1b1b1d;color:var(--text)}
   L.setClip = (c) => { clip = c || null; info(); };
 
   info();
+})();
+
+</script>
+<script>/* js/library.js */
+/* Lumen — biblioteca de carpetes: cada carpeta agrupa un lot de fotos editades (p. ex. un partit).
+   Crear, importar des del dispositiu, obrir, canviar el nom i eliminar. */
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const L = window.L, t = L.t;
+  const lib = $('library'), grid = $('libGrid');
+
+  const fmtDate = (iso) => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); return m ? m[3] + '/' + m[2] + '/' + m[1].slice(2) : ''; };
+  const nPhotos = (n) => (n === 1 ? t('photoN1') : t('photosN').replace('{n}', n));
+  const svg = (id) => '<svg class="ic" aria-hidden="true"><use href="#i-' + id + '"/></svg>';
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  /* ---------- Diàleg (nom + data) ---------- */
+  function ask(title, name, date) {
+    return new Promise((res) => {
+      const dlg = $('dlg'), nm = $('dlgName'), dt = $('dlgDate');
+      $('dlgTitle').textContent = title; nm.value = name || ''; dt.value = date || L.todayISO();
+      dlg.hidden = false; setTimeout(() => nm.focus(), 60);
+      const done = (v) => { dlg.hidden = true; $('dlgForm').onsubmit = null; $('dlgCancel').onclick = null; dlg.onpointerdown = null; res(v); };
+      $('dlgForm').onsubmit = (e) => { e.preventDefault(); done({ name: nm.value.trim(), date: dt.value }); };
+      $('dlgCancel').onclick = () => done(null);
+      dlg.onpointerdown = (e) => { if (e.target === dlg) done(null); };
+    });
+  }
+
+  /* ---------- Llista ---------- */
+  function sorted() {
+    return [...L.folders].sort((a, b) => (b.date || '').localeCompare(a.date || '') || b.updated - a.updated);
+  }
+  function render() {
+    grid.innerHTML = '';
+    const act = L.activeFolder();
+    const nb = document.createElement('button');
+    nb.className = 'fcard new'; nb.innerHTML = '<span class="plus">' + svg('folder-plus') + '</span><span class="fname" >' + esc(t('newFolder')) + '</span>';
+    nb.addEventListener('click', newFolder);
+    grid.appendChild(nb);
+    sorted().forEach((f, i) => {
+      const c = document.createElement('div');
+      c.className = 'fcard' + (act && act.id === f.id ? ' open' : ''); c.dataset.id = f.id; c.tabIndex = 0; c.setAttribute('role', 'button');
+      c.style.setProperty('--d', (i * 40) + 'ms');
+      c.innerHTML =
+        '<div class="cover">' + (f.cover ? '<img alt="" src="' + f.cover + '">' : '<span class="ph">' + svg('folder') + '</span>') +
+        (act && act.id === f.id ? '<span class="tag">' + esc(t('openNow')) + '</span>' : '') + '</div>' +
+        '<div class="finfo"><div class="fname">' + esc(f.name) + '</div><div class="fmeta">' + esc(nPhotos(f.count || 0)) + (f.date ? ' · ' + fmtDate(f.date) : '') + '</div></div>' +
+        '<div class="facts"><button class="mini" data-act="ren" aria-label="' + esc(t('tipRename')) + '" title="' + esc(t('tipRename')) + '">' + svg('pencil') + '</button>' +
+        '<button class="mini" data-act="del" aria-label="' + esc(t('tipDelete')) + '" title="' + esc(t('tipDelete')) + '">' + svg('trash-2') + '</button></div>';
+      grid.appendChild(c);
+    });
+    $('libEmpty').hidden = L.folders.length > 0;
+  }
+  L.hooks.folder = () => { if (!lib.hidden) render(); };
+
+  grid.addEventListener('click', async (e) => {
+    const card = e.target.closest('.fcard'); if (!card || card.classList.contains('new')) return;
+    const id = +card.dataset.id, f = L.folders.find((x) => x.id === id); if (!f) return;
+    const act = e.target.closest('[data-act]');
+    if (act && act.dataset.act === 'ren') {
+      const r = await ask(t('renameTitle'), f.name, f.date); if (r) await L.renameFolder(id, r.name, r.date);
+    } else if (act && act.dataset.act === 'del') {
+      if (!act.classList.contains('arm')) {
+        act.classList.add('arm'); act.innerHTML = '<span>' + esc(t('delSure')) + '</span>';
+        setTimeout(() => { if (act.isConnected) { act.classList.remove('arm'); act.innerHTML = svg('trash-2'); } }, 3000);
+      } else { await L.deleteFolder(id); L.toast(t('toastFolderDeleted')); render(); }
+    } else {
+      await L.openFolder(id); close();
+    }
+  });
+  grid.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.classList.contains('fcard') && !e.target.classList.contains('new')) e.target.click(); });
+
+  async function newFolder() {
+    const r = await ask(t('newFolderTitle'), '', L.todayISO()); if (!r) return;
+    await L.createFolder(r.name || t('folderAuto'), r.date);
+    close(); setTimeout(() => $('fileIn').click(), 0);       // directament a triar les fotos
+  }
+
+  /* Importar una carpeta sencera del dispositiu (Chrome d'escriptori); al mòbil s'obre el selector de fotos */
+  $('libImport').addEventListener('click', () => $('dirIn').click());
+  $('dirIn').addEventListener('change', async () => {
+    const files = [...$('dirIn').files].filter((f) => (f.type || '').startsWith('image/'));
+    const rel = $('dirIn').files[0] && $('dirIn').files[0].webkitRelativePath;
+    $('dirIn').value = '';
+    if (!files.length) { L.toast(t('toastNoImgs')); return; }
+    files.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+    let name = rel ? rel.split('/')[0] : '';
+    if (!name) { const r = await ask(t('newFolderTitle'), '', L.todayISO()); if (!r) return; name = r.name; await L.createFolder(name || t('folderAuto'), r.date); }
+    else await L.createFolder(name, L.todayISO());
+    close(); await L.addFiles(files);
+  });
+
+  /* ---------- Obrir / tancar ---------- */
+  function open() { render(); lib.hidden = false; lib.classList.remove('in'); void lib.offsetWidth; lib.classList.add('in'); }
+  function close() { lib.hidden = true; }
+  L.library = { open, close };
+  L.hooks.openLibrary = open;
+  $('btnFolder').addEventListener('click', open);
+  $('libClose').addEventListener('click', close);
+  window.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (!$('dlg').hidden) $('dlgCancel').click(); else if (!lib.hidden) close(); } });
 })();
 
 </script>
